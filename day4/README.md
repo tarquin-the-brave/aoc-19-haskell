@@ -12,11 +12,12 @@ completes and returns a `Just`, i.e. the condition wasn't met, or returns
 
 I suffered again from the issue of chosing a starting value.
 
-```haskell survivalFold f x = foldl (generalFoldFunction f) (Just '0') .
-show $ x
+```haskell
+survivalFold f x = foldl (generalFoldFunction f) (Just '0') . show $ x
 
-generalFoldFunction _ Nothing _ = Nothing generalFoldFunction f (Just x) y
-= if (f x y) then Nothing else Just y ```
+generalFoldFunction _ Nothing _ = Nothing
+generalFoldFunction f (Just x) y = if (f x y) then Nothing else Just y
+```
 
 I initially had `X` instead of `0` which was screwing up the comparison in
 the first step of the fold for the rule where digits can't decrease, as
@@ -33,8 +34,16 @@ above.
 
 I was hoping the compiler would optimise out passing through `Nothing` and
 bail as soon as the accumulator becomes `Nothing`, then this could be done
-to fold over an infinite list... sadly not: ```bash $ stack ghci ...  *Main
-Lib> foldl (generalFoldFunction (\x y-> x*y > 2500)) (Just 0) [1..100]
-Nothing *Main Lib> foldl (generalFoldFunction (\x y-> x*y > 2500)) (Just 0)
-[1..40] Just 40 *Main Lib> foldl (generalFoldFunction (\x y-> x*y > 2500))
-(Just 0) [1..] ^CInterrupted.  *Main Lib> ```
+to fold over an infinite list... sadly not:
+
+```bash
+$ stack ghci
+...
+*Main Lib> foldl (generalFoldFunction (\x y-> x*y > 2500)) (Just 0) [1..100]
+Nothing
+*Main Lib> foldl (generalFoldFunction (\x y-> x*y > 2500)) (Just 0) [1..40]
+Just 40
+*Main Lib> foldl (generalFoldFunction (\x y-> x*y > 2500)) (Just 0) [1..]
+^CInterrupted.
+*Main Lib>
+```
