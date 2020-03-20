@@ -1,5 +1,7 @@
 module Lib
-    ( someFunc
+    ( Direction(U,D,L,R)
+    , Translation(Translation)
+    , pathCrossings
     ) where
 
 import Data.List
@@ -44,8 +46,25 @@ infiniteSection Point{x=x, y=y, direction=_} R =
 -- and create segments, with the last element in the segment being the
 -- starting Point for the next segment.
 wire :: Point -> [Translation] -> [Point]
-wire = undefined
+wire point path  = foldl wireExtend [point] path
+
+wireExtend :: [Point] -> Translation -> [Point]
+wireExtend w t = w ++ section (last w) t
+
+wireFromOrigin :: [Translation] -> [Point]
+wireFromOrigin = wire Point{x=0, y=0, direction=Vertical}
 
 -- Wires cross when they contain Points that cross.
-wireCrossings :: [Point] -> [Point] -> [Point]
-wireCrossings = undefined
+wireCrossings :: [Point] -> [Point] -> [(Point, Point)]
+wireCrossings w1 w2 = filter (\(x, y) -> cross x y) ((\x y-> (x, y)) <$> w1 <*> w2)
+
+-- Pull out the coordinates of crossing points as tuples,
+-- so we don't need to expose the Point data aggregate
+-- outside this module.
+wireCrossCoordinates :: [Point] -> [Point] -> [(Int, Int)]
+wireCrossCoordinates w1 w2 = map (\(p, _)-> (x p, y p)) $ wireCrossings w1 w2
+
+-- Now express this data in terms of the paths that
+-- are the input to our program
+pathCrossings :: [Translation] -> [Translation] -> [(Int, Int)]
+pathCrossings p1 p2 = wireCrossCoordinates (wireFromOrigin p1) (wireFromOrigin p2)

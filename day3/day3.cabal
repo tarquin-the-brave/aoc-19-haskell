@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9382eaeed3febad2f16126a49b965c64e28b7c519866706cbfe78617d0a417d7
+-- hash: a3db2e07181e807ee4f6286bd1c57e28e72242ddbcb4cabadc251dc98dd68cdc
 
 name:           day3
 version:        0.1.0.0
@@ -34,6 +34,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , split
   default-language: Haskell2010
 
 executable day3-exe
@@ -46,6 +47,7 @@ executable day3-exe
   build-depends:
       base >=4.7 && <5
     , day3
+    , split
   default-language: Haskell2010
 
 test-suite day3-test
@@ -59,4 +61,5 @@ test-suite day3-test
   build-depends:
       base >=4.7 && <5
     , day3
+    , split
   default-language: Haskell2010
