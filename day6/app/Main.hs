@@ -3,7 +3,6 @@ module Main where
 import Lib
 import Data.Tree
 import Data.List.Split (splitOn)
-import Data.List (genericLength)
 
 main :: IO ()
 main = do
