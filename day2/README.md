@@ -18,6 +18,20 @@ Supprizingly, I found recursion was the answer... again... I was hoping
 exercise would teach me about mutation and stateful computation, but turns
 out not.
 
+I thought by applicative functor to search all the 4 digit correction
+codes would take ages... apparently not.
+
+```bash
+$ time stack run
+3101844
+[(84,78)]
+
+real    0m0.980s
+user    0m2.306s
+sys     0m0.277s
+$
+```
+
 ## Improvements to make
 
 ### Usage of `List`

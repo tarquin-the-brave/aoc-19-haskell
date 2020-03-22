@@ -1,9 +1,9 @@
 module Lib
-    ( RunState(..)
-    , Program(..)
-    , runProgram
-    , runStep
+    ( runIntcode
     ) where
+
+runIntcode :: [Int] -> Int
+runIntcode input = head . program . runProgram $ Program{program = input, state = Running, progressIndex = 0}
 
 data RunState = Running | Terminated | TerminatedBadly deriving(Show)
 data Program = Program {program::[Int], state::RunState, progressIndex::Int} deriving(Show)
