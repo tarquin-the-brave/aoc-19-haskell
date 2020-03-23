@@ -1,6 +1,7 @@
 module Main where
 
 import Lib
+import Data.Default
 import Data.List
 
 main :: IO ()
@@ -43,6 +44,6 @@ count012 s = (count '0' s, (count '1' s, count '2' s))
 count :: Integral a => Char -> String -> a
 count c = foldl (\acc x -> if x == c then acc + 1 else acc) 0
 
-sndMinFst :: Bounded a => Integral a => [(a , b)] -> b
-sndMinFst = snd . foldl (\acc x -> if fst x < fst acc then x else acc) (maxBound, undefined)
+sndMinFst :: Bounded a => Integral a => Default b => [(a , b)] -> b
+sndMinFst = snd . foldl (\acc x -> if fst x < fst acc then x else acc) (maxBound, def)
 

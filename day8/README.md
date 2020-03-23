@@ -11,13 +11,13 @@ zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
 ```
 
 `undefined` can be used to represent values that aren't evaluated, even at
-runtime! So I was able to use it in the fold when I didn't care about or ever
-evaluate part of the initial value. I've used it when testing type declarations
-by binding a function to `undefined`.
+runtime! But if you've expressing something that never evaluates, that might
+be a sign of something wrong.
 
-This function build and could be called at runtime.
+I used `Data.Default` from the `data-default` package to express a value
+I didn't care about.
 
 ```haskell
-sndMinFst :: Bounded a => Integral a => [(a , b)] -> b
-sndMinFst = snd . foldl (\acc x -> if fst x < fst acc then x else acc) (maxBound, undefined)
+sndMinFst :: Bounded a => Integral a => Default b => [(a , b)] -> b
+sndMinFst = snd . foldl (\acc x -> if fst x < fst acc then x else acc) (maxBound, def)
 ```
