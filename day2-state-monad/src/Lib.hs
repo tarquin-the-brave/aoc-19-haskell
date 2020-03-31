@@ -1,9 +1,5 @@
 module Lib
     ( runIntcode
-    , runProgram
-    , runStep
-    , Program (..)
-    , ProgramState (..)
     ) where
 
 import Control.Monad.State.Lazy
