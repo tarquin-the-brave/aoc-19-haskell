@@ -1,7 +1,8 @@
 module Intcode
     ( newProg
     , runProg
-    , stepProg) where
+    , stepProg
+    , Prog (..)) where
 
 import qualified Data.List.Safe as Safe
 

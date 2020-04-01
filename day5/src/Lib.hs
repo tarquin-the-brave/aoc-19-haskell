@@ -1,5 +1,7 @@
 module Lib
-    ( Intcode.runIntcode
+    ( Intcode.newProg
+    , Intcode.runProg
+    , Intcode.Prog (..)
     ) where
 
-import qualified Intcode as Intcode (runIntcode)
+import qualified Intcode as Intcode
