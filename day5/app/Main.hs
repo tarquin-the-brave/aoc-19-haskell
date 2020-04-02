@@ -10,3 +10,5 @@ main = do
 
   print . head . output . runProg . newProg diagscode $ [1]
 
+  print . head . output . runProg . newProg diagscode $ [5]
+

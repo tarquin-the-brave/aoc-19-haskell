@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a25cc3e82d4947f85f0f513cacacd4baa175c3aa6bd1a6d53c14c9a0086e8364
+-- hash: b3046c77947447b18e8e0aeb44955712655f490c8dfbf52527801b6b67cb688b
 
 name:           intcode
 version:        0.1.0.0
@@ -33,9 +33,23 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5,
-      mtl,
-      listsafe
+      base >=4.7 && <5
+    , listsafe
+    , mtl
+  default-language: Haskell2010
+
+executable intcode-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_intcode
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , intcode
+    , listsafe
+    , mtl
   default-language: Haskell2010
 
 test-suite intcode-test
@@ -49,4 +63,6 @@ test-suite intcode-test
   build-depends:
       base >=4.7 && <5
     , intcode
+    , listsafe
+    , mtl
   default-language: Haskell2010
