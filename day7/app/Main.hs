@@ -4,6 +4,7 @@ import Lib
 import Data.List.Split (splitOn)
 import Data.List (permutations)
 import Control.Monad
+import qualified Data.List.NonEmpty as NEL
 
 main :: IO ()
 main = do
@@ -24,8 +25,12 @@ main = do
 
   -- PART 2:
 
+
 phaseCombinations :: [[Int]]
 phaseCombinations = permutations [0..4]
+
+phaseCombinations' :: [NEL.NonEmpty Int]
+phaseCombinations' = fmap NEL.fromList phaseCombinations
 
 maxOut :: [(Maybe Int, [Int])] -> Maybe (Int, [Int])
 maxOut = foldl maxOutFoldFunc (Just (minBound, []))

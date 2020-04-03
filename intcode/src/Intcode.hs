@@ -3,7 +3,8 @@ module Intcode
     , runProg
     , stepProg
     , Prog (..)
-    , ProgState (..)) where
+    , ProgState (..)
+    , setInputProg) where
 
 import qualified Data.List.Safe as Safe
 
@@ -83,6 +84,15 @@ updateIntCode newIntCode prog = Prog{
 tailInput :: Prog -> Prog
 tailInput prog = Prog{
     input = tail $ input prog,
+    intCode = intCode prog,
+    progState = progState prog,
+    ip = ip prog,
+    output = output prog
+}
+
+setInputProg :: [Int] -> Prog -> Prog
+setInputProg i prog = Prog{
+    input = i,
     intCode = intCode prog,
     progState = progState prog,
     ip = ip prog,
