@@ -21,7 +21,7 @@ runProg prog = case progState prog of
    Running -> runProg . stepProg $ prog
    _ -> prog
 
-data ProgState = Running | Terminated | TerminatedBadly deriving(Show)
+data ProgState = Running | AwaitInput | Terminated | TerminatedBadly deriving(Show)
 data Prog = Prog {
   input::[Int],
   intCode::[Int],
@@ -45,6 +45,15 @@ endProg prog = Prog {
     input = input prog,
     intCode = intCode prog,
     progState = Terminated,
+    ip = ip prog,
+    output = output prog
+}
+
+awaitInputProg :: Prog -> Prog
+awaitInputProg prog = Prog {
+    input = input prog,
+    intCode = intCode prog,
+    progState = AwaitInput,
     ip = ip prog,
     output = output prog
 }
@@ -99,6 +108,7 @@ getCode prog = do
 runCode (Just (m1, m2, One)) = code1 m1 m2
 runCode (Just (m1, m2, Two)) = code2 m1 m2
 runCode (Just (_, _, Three)) = code3
+
 runCode (Just (m, _, Four)) = code4 m
 runCode (Just (m1, m2, Five)) = code5 m1 m2
 runCode (Just (m1, m2, Six)) = code6 m1 m2
@@ -122,9 +132,11 @@ applyOp3 prog = do
   op3 i (ip prog) (intCode prog)
 
 code3 :: Prog -> Prog
-code3 prog = case applyOp3 prog of
-  Nothing -> crashProg prog
-  Just newIntCode -> movePointer 2 . tailInput . updateIntCode newIntCode $ prog
+code3 prog = case Safe.head (input prog) of
+  Nothing -> awaitInputProg prog
+  Just inputValue -> case op3 inputValue (ip prog) (intCode prog) of
+    Nothing -> crashProg prog
+    Just newIntCode -> movePointer 2 . tailInput . updateIntCode newIntCode $ prog
 
 code4 :: ParamMode -> Prog -> Prog
 code4 mode prog = case op4 mode (ip prog) . intCode $ prog of
