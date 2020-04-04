@@ -24,8 +24,8 @@ main = do
   print max
 
   -- PART 2:
-  -- contents <- fmap lines . readFile $ "input.txt"
-  contents <- fmap lines . readFile $ "example-part2-1.txt"
+  contents <- fmap lines . readFile $ "input.txt"
+  -- contents <- fmap lines . readFile $ "example-part2-1.txt"
   -- contents <- fmap lines . readFile $ "example-part2-2.txt"
   let ampCode = fmap read . head . fmap (splitOn ",") $ contents :: [Int]
 

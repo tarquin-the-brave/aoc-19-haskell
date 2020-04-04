@@ -59,11 +59,11 @@ runAmpsLoop = do
   case (atFinalAmp amps, activeAmpStatus amps) of
     (_, TerminatedBadly) -> return Nothing
     (_, Running) -> return Nothing
-    (_, Terminated) -> return (Just out)
-    -- (False, Terminated) -> do
-    --   modify nextAmp
-    --   modify (activeAmpAppendInput out)
-    --   runAmpsLoop
+    (True, Terminated) -> return (Just out)
+    (False, Terminated) -> do
+      modify nextAmp
+      modify (activeAmpAppendInput out)
+      runAmpsLoop
     (_, AwaitInput) -> do
       modify nextAmp
       modify (activeAmpAppendInput out)
@@ -79,7 +79,7 @@ nextAmp amps = Amps {
 }
 
 atFinalAmp :: Amps -> Bool
-atFinalAmp amps = (activeAmp amps) == (length . ampsOf $ amps)
+atFinalAmp amps = (activeAmp amps) == ((length . ampsOf $ amps) - 1)
 
 -- Functions on The Active Amps
 --
