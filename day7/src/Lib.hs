@@ -3,10 +3,22 @@ module Lib
     , runProg
     , Prog (..)
     , ProgState (..)
-    , amplifyerPart1) where
+    , amplifyerPart1
+    , Amps (..)
+    , newAmps
+    , runAmpsLoop
+    -- for debugging
+    , runActiveAmpOutput
+    , runActiveAmp
+    , atFinalAmp
+    , nextAmp
+    , activeAmpSetInput
+    , activeAmpScrubOutput
+    , activeAmpAppendInput
+    , activeAmpStatus) where
 
 import Intcode
-import qualified Data.List.NonEmpty as NEL
+import Control.Monad.State.Lazy
 
 -- In part 1 we didn't car about keeping the state from running
 -- each amplifyer, so we can take the output of finishedProg
@@ -28,26 +40,79 @@ amplifyerPart1 ampCode i phase = case progState finishedProg of
 -- Suggest a giant state monad: s -> (a, s)
 -- s = [Amp]
 -- a = Int
-data Amp = Amp {ampProg::Prog, ampPhase::Int}
 
-newAmp :: [Int] -> Int -> Amp
-newAmp intcode phase = Amp {
-  ampProg = newProg intcode [],
-  ampPhase = phase
+--
+-- exported functions
+--
+data Amps = Amps { ampsOf::[Prog], activeAmp::Int } deriving(Show)
+
+newAmps :: [Int] -> [Int] -> Amps
+newAmps intcode phases = activeAmpAppendInput 0 Amps {
+  ampsOf = fmap (\p-> newProg intcode [p]) phases,
+  activeAmp = 0
 }
 
-setInputAmp :: [Int] -> Amp -> Amp
-setInputAmp newInput amp = Amp {
-  ampProg = setInputProg newInput (ampProg amp),
-  ampPhase = ampPhase amp
+runAmpsLoop :: State Amps (Maybe Int)
+runAmpsLoop = do
+  out <- runActiveAmpOutput'
+  amps <- get
+  case (atFinalAmp amps, activeAmpStatus amps) of
+    (_, TerminatedBadly) -> return Nothing
+    (_, Running) -> return Nothing
+    (_, Terminated) -> return (Just out)
+    -- (False, Terminated) -> do
+    --   modify nextAmp
+    --   modify (activeAmpAppendInput out)
+    --   runAmpsLoop
+    (_, AwaitInput) -> do
+      modify nextAmp
+      modify (activeAmpAppendInput out)
+      runAmpsLoop
+
+--
+-- Internal functions
+--
+nextAmp :: Amps -> Amps
+nextAmp amps = Amps {
+  ampsOf = ampsOf amps,
+  activeAmp = (activeAmp amps + 1) `mod` (length $ ampsOf amps)
 }
 
-data Amps = Amps { amps::NEL.NonEmpty Amp, activeAmp::Int }
+atFinalAmp :: Amps -> Bool
+atFinalAmp amps = (activeAmp amps) == (length . ampsOf $ amps)
 
-newAmps :: [Int] -> NEL.NonEmpty Int -> Amps
-newAmps intcode phases = Amps {
-  amps=fmap (newAmp intcode) phases,
-  activeAmp=0
+-- Functions on The Active Amps
+--
+runActiveAmpOutput' :: State Amps Int
+runActiveAmpOutput' = state runActiveAmpOutput
+
+runActiveAmpOutput :: Amps -> (Int, Amps)
+runActiveAmpOutput amps = (head . output . getActiveAmp $ newAmps, activeAmpScrubOutput newAmps)
+  where newAmps = runActiveAmp amps
+
+runActiveAmp :: Amps -> Amps
+runActiveAmp = editActiveAmp runProg
+
+activeAmpAppendInput :: Int -> Amps -> Amps
+activeAmpAppendInput newIn = editActiveAmp (appendInputProg newIn)
+
+activeAmpSetInput :: Int -> Amps -> Amps
+activeAmpSetInput newIn = editActiveAmp (setInputProg [newIn])
+
+activeAmpConsInput :: Int -> Amps -> Amps
+activeAmpConsInput newIn = editActiveAmp (consInputProg newIn)
+
+activeAmpScrubOutput :: Amps -> Amps
+activeAmpScrubOutput = editActiveAmp scrubOutput
+
+editActiveAmp :: (Prog -> Prog) -> Amps -> Amps
+editActiveAmp f amps = Amps {
+  ampsOf = replaceNthInner (activeAmp amps) (f . getActiveAmp $ amps) (ampsOf amps),
+  activeAmp = activeAmp amps
 }
 
+getActiveAmp :: Amps -> Prog
+getActiveAmp amps = (ampsOf amps)!!(activeAmp amps)
 
+activeAmpStatus :: Amps -> ProgState
+activeAmpStatus = progState . getActiveAmp

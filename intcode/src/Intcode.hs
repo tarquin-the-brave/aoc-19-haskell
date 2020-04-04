@@ -4,7 +4,11 @@ module Intcode
     , stepProg
     , Prog (..)
     , ProgState (..)
-    , setInputProg) where
+    , setInputProg
+    , consInputProg
+    , scrubOutput
+    , appendInputProg
+    , replaceNthInner) where
 
 import qualified Data.List.Safe as Safe
 
@@ -20,6 +24,9 @@ newProg newIntCode input = Prog{
 runProg :: Prog -> Prog
 runProg prog = case progState prog of
    Running -> runProg . stepProg $ prog
+   AwaitInput -> if (length . input $ prog) > 0
+     then runProg . stepProg $ prog
+     else prog
    _ -> prog
 
 data ProgState = Running | AwaitInput | Terminated | TerminatedBadly deriving(Show)
@@ -46,6 +53,15 @@ endProg prog = Prog {
     input = input prog,
     intCode = intCode prog,
     progState = Terminated,
+    ip = ip prog,
+    output = output prog
+}
+
+runningProg :: Prog -> Prog
+runningProg prog = Prog {
+    input = input prog,
+    intCode = intCode prog,
+    progState = Running,
     ip = ip prog,
     output = output prog
 }
@@ -99,6 +115,24 @@ setInputProg i prog = Prog{
     output = output prog
 }
 
+consInputProg :: Int -> Prog -> Prog
+consInputProg i prog = Prog{
+    input = i:(input prog),
+    intCode = intCode prog,
+    progState = progState prog,
+    ip = ip prog,
+    output = output prog
+}
+
+appendInputProg :: Int -> Prog -> Prog
+appendInputProg i prog = Prog{
+    input = (input prog) ++ [i],
+    intCode = intCode prog,
+    progState = progState prog,
+    ip = ip prog,
+    output = output prog
+}
+
 consOutput :: Int -> Prog -> Prog
 consOutput o prog = Prog{
     input = input prog,
@@ -106,6 +140,15 @@ consOutput o prog = Prog{
     progState = progState prog,
     ip = ip prog,
     output = o:(output prog)
+}
+
+scrubOutput :: Prog -> Prog
+scrubOutput prog = Prog{
+    input = input prog,
+    intCode = intCode prog,
+    progState = progState prog,
+    ip = ip prog,
+    output = []
 }
 
 stepProg :: Prog -> Prog
@@ -146,7 +189,7 @@ code3 prog = case Safe.head (input prog) of
   Nothing -> awaitInputProg prog
   Just inputValue -> case op3 inputValue (ip prog) (intCode prog) of
     Nothing -> crashProg prog
-    Just newIntCode -> movePointer 2 . tailInput . updateIntCode newIntCode $ prog
+    Just newIntCode -> movePointer 2 . runningProg . tailInput . updateIntCode newIntCode $ prog
 
 code4 :: ParamMode -> Prog -> Prog
 code4 mode prog = case op4 mode (ip prog) . intCode $ prog of
