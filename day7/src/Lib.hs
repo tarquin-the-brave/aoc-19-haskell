@@ -6,16 +6,7 @@ module Lib
     , amplifyerPart1
     , Amps (..)
     , newAmps
-    , runAmpsLoop
-    -- for debugging
-    , runActiveAmpOutput
-    , runActiveAmp
-    , atFinalAmp
-    , nextAmp
-    , activeAmpSetInput
-    , activeAmpScrubOutput
-    , activeAmpAppendInput
-    , activeAmpStatus) where
+    , runAmpsLoop) where
 
 import Intcode
 import Control.Monad.State.Lazy
@@ -32,14 +23,9 @@ amplifyerPart1 ampCode i phase = case progState finishedProg of
   where finishedProg = runProg . newProg ampCode $ [phase, i]
 
 -- In part 2 amplifiers run in a loop till the programs terminate.
--- I think this means that the intcode computer will need a new state
--- of AwaitInput.  As the amplifiers are looped through they will
--- rest in AwaitInput state until the "final" loop.
--- Behaviour of runProg will need take account of input program not
--- being fresh.
--- Suggest a giant state monad: s -> (a, s)
--- s = [Amp]
--- a = Int
+-- Intcode computer will need a new state of AwaitInput.
+-- As the amplifiers are looped through they will rest in AwaitInput
+-- state until the "final" loop where they become Terminated
 
 --
 -- exported functions
@@ -95,12 +81,6 @@ runActiveAmp = editActiveAmp runProg
 
 activeAmpAppendInput :: Int -> Amps -> Amps
 activeAmpAppendInput newIn = editActiveAmp (appendInputProg newIn)
-
-activeAmpSetInput :: Int -> Amps -> Amps
-activeAmpSetInput newIn = editActiveAmp (setInputProg [newIn])
-
-activeAmpConsInput :: Int -> Amps -> Amps
-activeAmpConsInput newIn = editActiveAmp (consInputProg newIn)
 
 activeAmpScrubOutput :: Amps -> Amps
 activeAmpScrubOutput = editActiveAmp scrubOutput
