@@ -16,7 +16,7 @@ singleStepTests :: TestTree
 singleStepTests = testGroup "Test progressing the program by one instruction" [op12Tests, op56Tests, op203Tests]
 
 op12Tests :: TestTree
-op12Tests = testGroup "Test progressing the program by one instruction"
+op12Tests = testGroup "tests for op codes 1 & 2"
   [ testCase "Day 2 example 1 step 1" $
     stepProg day2Example1Init  @?= day2Example1Step1
 
@@ -320,6 +320,10 @@ day9Examples = testGroup "Test examples from day 9 of AOC"
 
     , testCase "try a bit" $
     (runProg $ newProg [109,1,204,-1,99] []) @?= Prog { input=[], intCode=[109,1,204,-1,99], progState=Terminated, ip=4, rb=1, output=[109]}
+
+    , testCase "3rd param in relative mode - op code 1" $
+    (output . runProg $ newProg [109,10, 21101,4,5,0, 4,10, 99] [])  @?= [9]
+    -- (output . runProg $ newProg [109,10, 1101,4,5,10, 4,10, 99] [])  @?= [9]
   ]
 
 day9e1 :: [Int]

@@ -9,4 +9,9 @@ main = do
   contents <- fmap lines . readFile $ "input.txt"
   let code = fmap read . head . fmap (splitOn ",") $ contents :: [Int]
 
-  print $ output . runProg $ newProg code [1]
+  let x = runProg $ newProg code [1]
+  print $ output x
+
+  -- PART 2: use input to to get the coordinates of the distress signal
+  let y = runProg $ newProg code [2]
+  print $ output y

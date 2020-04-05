@@ -186,31 +186,31 @@ scrubOutput prog = Prog{
 stepProg :: Prog -> Prog
 stepProg prog = runCode (getCode prog) prog
 
-getCode :: Prog -> Maybe (ParamMode, ParamMode, OpCode)
+getCode :: Prog -> Maybe (ParamMode, ParamMode, ParamMode, OpCode)
 getCode prog = do
   code <- (intCode prog) !!! (ip prog)
   parseModesCode (rb prog) code
 
-runCode :: Maybe (ParamMode, ParamMode, OpCode) -> Prog -> Prog
-runCode (Just (m1, m2, One)) = code1 m1 m2
-runCode (Just (m1, m2, Two)) = code2 m1 m2
-runCode (Just (m, _, Three)) = code3 m
-runCode (Just (m, _, Four)) = code4 m
-runCode (Just (m1, m2, Five)) = code5 m1 m2
-runCode (Just (m1, m2, Six)) = code6 m1 m2
-runCode (Just (m1, m2, Seven)) = code7 m1 m2
-runCode (Just (m1, m2, Eight)) = code8 m1 m2
-runCode (Just (m, _, Nine)) = code9 m
-runCode (Just (_, _, NinetyNine)) = code99
+runCode :: Maybe (ParamMode, ParamMode, ParamMode, OpCode) -> Prog -> Prog
+runCode (Just (m1, m2, m3, One)) = code1 m1 m2 m3
+runCode (Just (m1, m2, m3, Two)) = code2 m1 m2 m3
+runCode (Just (m, _, _, Three)) = code3 m
+runCode (Just (m, _, _, Four)) = code4 m
+runCode (Just (m1, m2, _, Five)) = code5 m1 m2
+runCode (Just (m1, m2, _, Six)) = code6 m1 m2
+runCode (Just (m1, m2, m3, Seven)) = code7 m1 m2 m3
+runCode (Just (m1, m2, m3, Eight)) = code8 m1 m2 m3
+runCode (Just (m, _, _, Nine)) = code9 m
+runCode (Just (_, _, _, NinetyNine)) = code99
 runCode Nothing = codeX
 
-code1 :: ParamMode -> ParamMode -> Prog -> Prog
-code1 mode1 mode2 prog = case op1 mode1 mode2 (ip prog) . intCode $ prog of
+code1 :: ParamMode -> ParamMode -> ParamMode -> Prog -> Prog
+code1 mode1 mode2 mode3 prog = case op1 mode1 mode2 mode3 (ip prog) . intCode $ prog of
   Nothing -> crashProg prog
   Just newIntCode -> movePointer 4 . updateIntCode newIntCode $ prog
 
-code2 :: ParamMode -> ParamMode -> Prog -> Prog
-code2 mode1 mode2 prog = case op2 mode1 mode2 (ip prog) . intCode $ prog of
+code2 :: ParamMode -> ParamMode -> ParamMode -> Prog -> Prog
+code2 mode1 mode2 mode3 prog = case op2 mode1 mode2 mode3 (ip prog) . intCode $ prog of
   Nothing -> crashProg prog
   Just newIntCode -> movePointer 4 . updateIntCode newIntCode $ prog
 
@@ -236,18 +236,17 @@ code5 mode1 mode2 prog = case op5 mode1 mode2 (ip prog) . intCode $ prog of
 code6 :: ParamMode -> ParamMode -> Prog -> Prog
 code6 mode1 mode2 prog = case op6 mode1 mode2 (ip prog) . intCode $ prog of
   Nothing -> movePointer 3 prog
-  -- Just newIp -> setPointer newIp prog
   Just newIp -> if newIp >= 0 && newIp < length (intCode prog)
     then setPointer newIp prog
     else crashProg prog
 
-code7 :: ParamMode -> ParamMode -> Prog -> Prog
-code7 mode1 mode2 prog = case op7 mode1 mode2 (ip prog) . intCode $ prog of
+code7 :: ParamMode -> ParamMode -> ParamMode -> Prog -> Prog
+code7 mode1 mode2 mode3 prog = case op7 mode1 mode2 mode3 (ip prog) . intCode $ prog of
   Nothing -> crashProg prog
   Just newIntCode -> movePointer 4 . updateIntCode newIntCode $ prog
 
-code8 :: ParamMode -> ParamMode -> Prog -> Prog
-code8 mode1 mode2 prog = case op8 mode1 mode2 (ip prog) . intCode $ prog of
+code8 :: ParamMode -> ParamMode -> ParamMode -> Prog -> Prog
+code8 mode1 mode2 mode3 prog = case op8 mode1 mode2 mode3 (ip prog) . intCode $ prog of
   Nothing -> crashProg prog
   Just newIntCode -> movePointer 4 . updateIntCode newIntCode $ prog
 
@@ -262,22 +261,24 @@ code99 = endProg
 codeX :: Prog -> Prog
 codeX = crashProg
 
-op1 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
-op2 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
-op7 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
-op8 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op1 :: ParamMode -> ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op2 :: ParamMode -> ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op7 :: ParamMode -> ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op8 :: ParamMode -> ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
 
 op1 = opBinary (+)
 op2 = opBinary (*)
 op7 = opBinary (\p1 p2 -> if p1 < p2 then 1 else 0)
 op8 = opBinary (\p1 p2 -> if p1 == p2 then 1 else 0)
 
-opBinary :: (Int -> Int -> Int) -> ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
-opBinary f mode1 mode2 idx xs = do
+opBinary :: (Int -> Int -> Int) -> ParamMode -> ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+opBinary f mode1 mode2 mode3 idx xs = do
   n <- xs !!! (idx + 3)
   p1 <- getParam mode1 (idx + 1) xs
   p2 <- getParam mode2 (idx + 2) xs
-  replaceNth n (f p1 p2) xs
+  case mode3 of
+    Rel base -> replaceNth (n+base) (f p1 p2) xs
+    _ -> replaceNth n (f p1 p2) xs
 
 op3 :: Int -> ParamMode -> Int -> [Int] -> Maybe [Int]
 op3 i mode idx xs = do
@@ -332,12 +333,13 @@ getParam (Rel base) idx xs = do
 
 data OpCode = One | Two | Three | Four | Five | Six | Seven | Eight | Nine | NinetyNine deriving(Show)
 
-parseModesCode :: Int -> Int -> Maybe (ParamMode, ParamMode, OpCode)
-parseModesCode relbase num = if num > 2299 then Nothing else do
+parseModesCode :: Int -> Int -> Maybe (ParamMode, ParamMode, ParamMode, OpCode)
+parseModesCode relbase num = do
   op <- parseOpCode $ num `mod` 100
   m1 <- parseParamMode relbase $ num `div` 100 `mod` 10
-  m2 <- parseParamMode relbase $ num `div` 1000
-  Just (m1, m2, op)
+  m2 <- parseParamMode relbase $ num `div` 1000 `mod` 10
+  m3 <- parseParamMode relbase $ num `div` 10000 `mod` 10
+  Just (m1, m2, m3, op)
 
 parseOpCode :: Int -> Maybe OpCode
 parseOpCode num
