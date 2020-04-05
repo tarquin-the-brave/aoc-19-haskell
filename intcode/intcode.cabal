@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b3046c77947447b18e8e0aeb44955712655f490c8dfbf52527801b6b67cb688b
+-- hash: 96ebd7bccd5f13d9dc99af8d23d10dffbcba48341668fe9292caf7ddcda9407a
 
 name:           intcode
 version:        0.1.0.0
@@ -38,20 +38,6 @@ library
     , mtl
   default-language: Haskell2010
 
-executable intcode-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_intcode
-  hs-source-dirs:
-      app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.7 && <5
-    , intcode
-    , listsafe
-    , mtl
-  default-language: Haskell2010
-
 test-suite intcode-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
@@ -65,4 +51,6 @@ test-suite intcode-test
     , intcode
     , listsafe
     , mtl
+    , tasty
+    , tasty-hunit
   default-language: Haskell2010

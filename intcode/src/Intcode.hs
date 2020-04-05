@@ -13,8 +13,8 @@ module Intcode
 import qualified Data.List.Safe as Safe
 
 newProg :: [Int] -> [Int] -> Prog
-newProg newIntCode input = Prog{
-  input = input,
+newProg newIntCode progInput = Prog{
+  input = progInput,
   intCode = newIntCode,
   progState = Running,
   ip = 0,
@@ -29,7 +29,7 @@ runProg prog = case progState prog of
      else prog
    _ -> prog
 
-data ProgState = Running | AwaitInput | Terminated | TerminatedBadly deriving(Show)
+data ProgState = Running | AwaitInput | Terminated | TerminatedBadly deriving(Show, Eq)
 data Prog = Prog {
   input::[Int],
   intCode::[Int],
@@ -37,7 +37,7 @@ data Prog = Prog {
   -- ip: Instruction Pointer
   ip::Int,
   output::[Int]
-} deriving(Show)
+} deriving(Show, Eq)
 
 crashProg :: Prog -> Prog
 crashProg prog = Prog {
@@ -154,10 +154,12 @@ scrubOutput prog = Prog{
 stepProg :: Prog -> Prog
 stepProg prog = runCode (getCode prog) prog
 
+getCode :: Prog -> Maybe (ParamMode, ParamMode, OpCode)
 getCode prog = do
   code <- (intCode prog) Safe.!! (ip prog)
   parseOpCode code
 
+runCode :: Maybe (ParamMode, ParamMode, OpCode) -> Prog -> Prog
 runCode (Just (m1, m2, One)) = code1 m1 m2
 runCode (Just (m1, m2, Two)) = code2 m1 m2
 runCode (Just (_, _, Three)) = code3
@@ -179,10 +181,6 @@ code2 :: ParamMode -> ParamMode -> Prog -> Prog
 code2 mode1 mode2 prog = case op2 mode1 mode2 (ip prog) . intCode $ prog of
   Nothing -> crashProg prog
   Just newIntCode -> movePointer 4 . updateIntCode newIntCode $ prog
-
-applyOp3 prog = do
-  i <- Safe.head (input prog)
-  op3 i (ip prog) (intCode prog)
 
 code3 :: Prog -> Prog
 code3 prog = case Safe.head (input prog) of
@@ -226,6 +224,11 @@ code99 = endProg
 codeX :: Prog -> Prog
 codeX = crashProg
 
+op1 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op2 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op7 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op8 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
+
 op1 = opBinary (+)
 op2 = opBinary (*)
 op7 = opBinary (\p1 p2 -> if p1 < p2 then 1 else 0)
@@ -245,6 +248,9 @@ op3 i idx xs = do
 
 op4 :: ParamMode -> Int -> [Int] -> Maybe Int
 op4 mode idx xs = getParam mode (idx + 1) xs
+
+op5 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe Int
+op6 :: ParamMode -> ParamMode -> Int -> [Int] -> Maybe Int
 
 op5 = opJumpIf (/=0)
 op6 = opJumpIf (==0)
