@@ -62,6 +62,7 @@ runProgramTests = testGroup "Test runnning the program til it stops"
   [
     day2Examples
     , day5Examples
+    , day9Examples
   ]
 
 day2Examples :: TestTree
@@ -224,3 +225,31 @@ day5BigExample :: [Int]
 day5BigExample = [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
                   1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
                   999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99]
+
+--
+-- day9 examples.  day 9 introduced relative mode and op code 9
+-- that changes the relative base offset to the value of its
+-- parameter.
+--
+day9Examples :: TestTree
+day9Examples = testGroup "Test examples from day 9 of AOC"
+  [
+    testCase "Day 9 example 1 - copy of self" $
+    (output $ runProg $ newProg day9e1 []) @?= day9e1
+
+    , testCase "Day 9 example 2 - output 16 digit number" $
+    (length $ show $ head $ output $ runProg $ newProg day9e2 []) @?= 16
+
+    , testCase "Day 9 example 3 - output large munber in the middle" $
+    (output $ runProg $ newProg day9e3 []) @?= [day9e3 !! 1]
+  ]
+
+day9e1 :: [Int]
+day9e1 = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
+
+day9e2 :: [Int]
+day9e2 = [1102,34915192,34915192,7,4,7,99,0]
+
+day9e3 :: [Int]
+day9e3 = [104,1125899906842624,99]
+
