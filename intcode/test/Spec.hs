@@ -10,10 +10,13 @@ tests :: TestTree
 tests = testGroup "Tests" [unitTests]
 
 unitTests :: TestTree
-unitTests = testGroup "Unit tests" [singleStepTests, runProgramTests, op56Testing]
+unitTests = testGroup "Unit tests" [singleStepTests, runProgramTests]
 
 singleStepTests :: TestTree
-singleStepTests = testGroup "Test progressing the program by one instruction"
+singleStepTests = testGroup "Test progressing the program by one instruction" [op12Tests, op56Tests, op203Tests]
+
+op12Tests :: TestTree
+op12Tests = testGroup "Test progressing the program by one instruction"
   [ testCase "Day 2 example 1 step 1" $
     stepProg day2Example1Init  @?= day2Example1Step1
 
@@ -60,6 +63,60 @@ day2Example1Fin = Prog{
   output=[]
 }
 
+--
+-- OpCode 5 & 6 testing
+--
+op56Tests :: TestTree
+op56Tests = testGroup "Some testing of Opcodes 5 & 6"
+  [
+    testCase "op code 6 - test 1" $
+    (stepProg $ newProg [6,4,5,99,0,8,0,0,99] []) @?= op6test1out
+  ]
+
+
+op6test1out :: Prog
+op6test1out = Prog {
+  input=[],
+  intCode=[6,4,5,99,0,8,0,0,99],
+  progState=Running,
+  ip=8,
+  rb=0,
+  output=[]
+}
+
+--
+-- Op 203 testing - op3 i relative mode
+--
+op203Tests :: TestTree
+op203Tests = testGroup "test 203 op code"
+  [
+    testCase "simple case" $
+    (stepProg simple203in) @?= simple203out
+  ]
+
+simple203in :: Prog
+simple203in = Prog {
+  input=[42],
+  intCode=[203,2,99],
+  progState=Running,
+  ip=0,
+  rb=10,
+  output=[]
+}
+
+simple203out :: Prog
+simple203out = Prog {
+  input=[],
+  intCode=[203,2,99,0,0,0,0,0,0,0,0,0,42],
+  progState=Running,
+  ip=0,
+  rb=10,
+  output=[]
+}
+
+--
+-- Tests that run the whole program til stop
+--
 runProgramTests :: TestTree
 runProgramTests = testGroup "Test runnning the program til it stops"
   [
@@ -273,27 +330,4 @@ day9e2 = [1102,34915192,34915192,7,4,7,99,0]
 
 day9e3 :: [Int]
 day9e3 = [104,1125899906842624,99]
-
---
--- OpCode 5 & 6 testing
---
-op56Testing :: TestTree
-op56Testing = testGroup "Some testing of Opcodes 5 & 6"
-  [
-    testCase "op code 6 - test 1" $
-    (stepProg $ newProg [6,4,5,99,0,8,0,0,99] []) @?= op6test1out
-  ]
-
-
-op6test1out :: Prog
-op6test1out = Prog {
-  input=[],
-  intCode=[6,4,5,99,0,8,0,0,99],
-  progState=Running,
-  ip=8,
-  rb=0,
-  output=[]
-}
-
-
 
