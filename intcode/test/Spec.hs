@@ -10,7 +10,7 @@ tests :: TestTree
 tests = testGroup "Tests" [unitTests]
 
 unitTests :: TestTree
-unitTests = testGroup "Unit tests" [singleStepTests, runProgramTests]
+unitTests = testGroup "Unit tests" [singleStepTests, runProgramTests, op56Testing]
 
 singleStepTests :: TestTree
 singleStepTests = testGroup "Test progressing the program by one instruction"
@@ -244,7 +244,7 @@ day9Examples :: TestTree
 day9Examples = testGroup "Test examples from day 9 of AOC"
   [
     testCase "Day 9 example 1 - copy of self" $
-    (output $ runProg $ newProg day9e1 []) @?= day9e1
+    (output $ runProg $ newProg day9e1 []) @?= reverse day9e1
 
     , testCase "Day 9 example 2 - output 16 digit number" $
     (length $ show $ head $ output $ runProg $ newProg day9e2 []) @?= 16
@@ -257,6 +257,12 @@ day9Examples = testGroup "Test examples from day 9 of AOC"
 
     , testCase "Read value to beyond end of program - should be 0" $
     (output . runProg $ newProg [4,22,99] []) @?= [0]
+
+    , testCase "specific problem" $
+    (output . stepProg . stepProg $ newProg day9e1 []) @?= [109]
+
+    , testCase "try a bit" $
+    (runProg $ newProg [109,1,204,-1,99] []) @?= Prog { input=[], intCode=[109,1,204,-1,99], progState=Terminated, ip=4, rb=1, output=[109]}
   ]
 
 day9e1 :: [Int]
@@ -267,4 +273,27 @@ day9e2 = [1102,34915192,34915192,7,4,7,99,0]
 
 day9e3 :: [Int]
 day9e3 = [104,1125899906842624,99]
+
+--
+-- OpCode 5 & 6 testing
+--
+op56Testing :: TestTree
+op56Testing = testGroup "Some testing of Opcodes 5 & 6"
+  [
+    testCase "op code 6 - test 1" $
+    (stepProg $ newProg [6,4,5,99,0,8,0,0,99] []) @?= op6test1out
+  ]
+
+
+op6test1out :: Prog
+op6test1out = Prog {
+  input=[],
+  intCode=[6,4,5,99,0,8,0,0,99],
+  progState=Running,
+  ip=8,
+  rb=0,
+  output=[]
+}
+
+
 
