@@ -109,7 +109,7 @@ simple203out = Prog {
   input=[],
   intCode=[203,2,99,0,0,0,0,0,0,0,0,0,42],
   progState=Running,
-  ip=0,
+  ip=2,
   rb=10,
   output=[]
 }

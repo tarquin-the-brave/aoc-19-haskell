@@ -11,6 +11,7 @@ module Intcode
     ,getParam
     ,ParamMode (..)
     ,parseParamMode
+    , op3
     , replaceNth
     , parseModesCode
     , appendInputProg
@@ -193,7 +194,7 @@ getCode prog = do
 runCode :: Maybe (ParamMode, ParamMode, OpCode) -> Prog -> Prog
 runCode (Just (m1, m2, One)) = code1 m1 m2
 runCode (Just (m1, m2, Two)) = code2 m1 m2
-runCode (Just (_, _, Three)) = code3
+runCode (Just (m, _, Three)) = code3 m
 runCode (Just (m, _, Four)) = code4 m
 runCode (Just (m1, m2, Five)) = code5 m1 m2
 runCode (Just (m1, m2, Six)) = code6 m1 m2
@@ -213,10 +214,10 @@ code2 mode1 mode2 prog = case op2 mode1 mode2 (ip prog) . intCode $ prog of
   Nothing -> crashProg prog
   Just newIntCode -> movePointer 4 . updateIntCode newIntCode $ prog
 
-code3 :: Prog -> Prog
-code3 prog = case Safe.head (input prog) of
+code3 :: ParamMode -> Prog -> Prog
+code3 mode prog = case Safe.head (input prog) of
   Nothing -> awaitInputProg prog
-  Just inputValue -> case op3 inputValue (ip prog) (intCode prog) of
+  Just inputValue -> case op3 inputValue mode (ip prog) (intCode prog) of
     Nothing -> crashProg prog
     Just newIntCode -> movePointer 2 . runningProg . tailInput . updateIntCode newIntCode $ prog
 
@@ -278,10 +279,12 @@ opBinary f mode1 mode2 idx xs = do
   p2 <- getParam mode2 (idx + 2) xs
   replaceNth n (f p1 p2) xs
 
-op3 :: Int -> Int -> [Int] -> Maybe [Int]
-op3 i idx xs = do
+op3 :: Int -> ParamMode -> Int -> [Int] -> Maybe [Int]
+op3 i mode idx xs = do
   n <- xs !!! (idx + 1)
-  replaceNth n i xs
+  case mode of
+    Rel base -> replaceNth (n+base) i xs
+    _ -> replaceNth n i xs
 
 op4 :: ParamMode -> Int -> [Int] -> Maybe Int
 op4 mode idx xs = getParam mode (idx + 1) xs
