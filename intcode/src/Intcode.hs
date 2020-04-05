@@ -7,6 +7,7 @@ module Intcode
     , setInputProg
     , consInputProg
     , scrubOutput
+    ,setRb
     , appendInputProg
     , replaceNthInner) where
 
@@ -18,6 +19,7 @@ newProg newIntCode progInput = Prog{
   intCode = newIntCode,
   progState = Running,
   ip = 0,
+  rb = 0,
   output = []
 }
 
@@ -36,6 +38,8 @@ data Prog = Prog {
   progState::ProgState,
   -- ip: Instruction Pointer
   ip::Int,
+  -- rb: Relative Base
+  rb::Int,
   output::[Int]
 } deriving(Show, Eq)
 
@@ -45,6 +49,7 @@ crashProg prog = Prog {
     intCode = intCode prog,
     progState = TerminatedBadly,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -54,6 +59,7 @@ endProg prog = Prog {
     intCode = intCode prog,
     progState = Terminated,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -63,6 +69,7 @@ runningProg prog = Prog {
     intCode = intCode prog,
     progState = Running,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -72,6 +79,7 @@ awaitInputProg prog = Prog {
     intCode = intCode prog,
     progState = AwaitInput,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -84,6 +92,17 @@ setPointer i prog = Prog{
     intCode = intCode prog,
     progState = progState prog,
     ip = i,
+    rb = rb prog,
+    output = output prog
+}
+
+setRb :: Int -> Prog -> Prog
+setRb b prog = Prog{
+    input = input prog,
+    intCode = intCode prog,
+    progState = progState prog,
+    ip = ip prog,
+    rb = b,
     output = output prog
 }
 
@@ -93,6 +112,7 @@ updateIntCode newIntCode prog = Prog{
     intCode = newIntCode,
     progState = progState prog,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -103,6 +123,7 @@ tailInput prog = Prog{
     intCode = intCode prog,
     progState = progState prog,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -112,6 +133,7 @@ setInputProg i prog = Prog{
     intCode = intCode prog,
     progState = progState prog,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -121,6 +143,7 @@ consInputProg i prog = Prog{
     intCode = intCode prog,
     progState = progState prog,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -130,6 +153,7 @@ appendInputProg i prog = Prog{
     intCode = intCode prog,
     progState = progState prog,
     ip = ip prog,
+    rb = rb prog,
     output = output prog
 }
 
@@ -139,6 +163,7 @@ consOutput o prog = Prog{
     intCode = intCode prog,
     progState = progState prog,
     ip = ip prog,
+    rb = rb prog,
     output = o:(output prog)
 }
 
@@ -148,6 +173,7 @@ scrubOutput prog = Prog{
     intCode = intCode prog,
     progState = progState prog,
     ip = ip prog,
+    rb = rb prog,
     output = []
 }
 
@@ -156,7 +182,7 @@ stepProg prog = runCode (getCode prog) prog
 
 getCode :: Prog -> Maybe (ParamMode, ParamMode, OpCode)
 getCode prog = do
-  code <- (intCode prog) Safe.!! (ip prog)
+  code <- (intCode prog) !!! (ip prog)
   parseOpCode code
 
 runCode :: Maybe (ParamMode, ParamMode, OpCode) -> Prog -> Prog
@@ -169,6 +195,7 @@ runCode (Just (m1, m2, Five)) = code5 m1 m2
 runCode (Just (m1, m2, Six)) = code6 m1 m2
 runCode (Just (m1, m2, Seven)) = code7 m1 m2
 runCode (Just (m1, m2, Eight)) = code8 m1 m2
+runCode (Just (m, _, Nine)) = code9 m
 runCode (Just (_, _, NinetyNine)) = code99
 runCode Nothing = codeX
 
@@ -218,6 +245,11 @@ code8 mode1 mode2 prog = case op8 mode1 mode2 (ip prog) . intCode $ prog of
   Nothing -> crashProg prog
   Just newIntCode -> movePointer 4 . updateIntCode newIntCode $ prog
 
+code9 :: ParamMode -> Prog -> Prog
+code9 mode prog = case op4 mode (ip prog) . intCode $ prog of
+  Nothing -> crashProg prog
+  Just newRb -> movePointer 2 . setRb newRb $ prog
+
 code99 :: Prog -> Prog
 code99 = endProg
 
@@ -236,14 +268,14 @@ op8 = opBinary (\p1 p2 -> if p1 == p2 then 1 else 0)
 
 opBinary :: (Int -> Int -> Int) -> ParamMode -> ParamMode -> Int -> [Int] -> Maybe [Int]
 opBinary f mode1 mode2 idx xs = do
-  n <- xs Safe.!! (idx + 3)
+  n <- xs !!! (idx + 3)
   p1 <- getParam mode1 (idx + 1) xs
   p2 <- getParam mode2 (idx + 2) xs
   replaceNth n (f p1 p2) xs
 
 op3 :: Int -> Int -> [Int] -> Maybe [Int]
 op3 i idx xs = do
-  n <- xs Safe.!! (idx + 1)
+  n <- xs !!! (idx + 1)
   replaceNth n i xs
 
 op4 :: ParamMode -> Int -> [Int] -> Maybe Int
@@ -261,11 +293,12 @@ opJumpIf condition mode1 mode2 idx xs = do
   p2 <- getParam mode2 (idx + 2) xs
   if condition p1 then Just p2 else Nothing
 
-replaceNth :: Int -> a -> [a] -> Maybe [a]
+replaceNth :: Num a => Int -> a -> [a] -> Maybe [a]
 replaceNth n newVal xs
   | n < 0 = Nothing
   | n < length xs = Just $ replaceNthInner n newVal xs
-  | otherwise = Nothing
+  | n == length xs = Just $ xs ++ [newVal]
+  | n > length xs = Just $ xs ++ [0 | _ <- [1..(n - length xs)]] ++ [newVal]
 
 replaceNthInner :: Int -> a -> [a] -> [a]
 replaceNthInner _ _ [] = []
@@ -273,15 +306,22 @@ replaceNthInner n newVal (x:xs)
    | n == 0 = newVal:xs
    | otherwise = x:replaceNthInner (n-1) newVal xs
 
+(!!!) :: Num a => [a] -> Int -> Maybe a
+infixl 9 !!!
+xs !!! i
+  | i < 0 = Nothing
+  | i >= length xs = Just 0
+  | otherwise = xs Safe.!! i
+
 data ParamMode = Pos | Imm deriving(Show)
 
 getParam :: ParamMode -> Int -> [Int] -> Maybe Int
 getParam Pos idx xs = do
-  p <- xs Safe.!! idx
-  xs Safe.!! p
-getParam Imm idx xs = xs Safe.!! idx
+  p <- xs !!! idx
+  xs !!! p
+getParam Imm idx xs = xs !!! idx
 
-data OpCode = One | Two | Three | Four | Five | Six | Seven | Eight | NinetyNine deriving(Show)
+data OpCode = One | Two | Three | Four | Five | Six | Seven | Eight | Nine | NinetyNine deriving(Show)
 
 parseOpCode :: Int -> Maybe (ParamMode, ParamMode, OpCode)
 parseOpCode num
@@ -312,6 +352,8 @@ parseOpCode num
   | num == 108 = Just (Imm, Pos, Eight)
   | num == 1008 = Just (Pos, Imm, Eight)
   | num == 1108 = Just (Imm, Imm, Eight)
+  | num == 9 = Just (Pos, Pos, Nine)
+  | num == 109 = Just (Imm, Pos, Nine)
   | num == 99 = Just (Pos, Pos, NinetyNine)
   | otherwise = Nothing
 

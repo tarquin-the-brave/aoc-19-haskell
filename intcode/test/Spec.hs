@@ -36,6 +36,7 @@ day2Example1Step1 = Prog{
   intCode=[1,9,10,70,2,3,11,0,99,30,40,50],
   progState=Running,
   ip=4,
+  rb=0,
   output=[]
 }
 
@@ -45,6 +46,7 @@ day2Example1Step2 = Prog{
   intCode=[3500,9,10,70,2,3,11,0,99,30,40,50],
   progState=Running,
   ip=8,
+  rb=0,
   output=[]
 }
 
@@ -54,6 +56,7 @@ day2Example1Fin = Prog{
   intCode=[3500,9,10,70,2,3,11,0,99,30,40,50],
   progState=Terminated,
   ip=8,
+  rb=0,
   output=[]
 }
 
@@ -102,6 +105,7 @@ day2Example2Fin = Prog{
   intCode=[2,0,0,0,99],
   progState=Terminated,
   ip=4,
+  rb=0,
   output=[]
 }
 
@@ -111,6 +115,7 @@ day2Example3Fin = Prog{
   intCode=[2,3,0,6,99],
   progState=Terminated,
   ip=4,
+  rb=0,
   output=[]
 }
 
@@ -120,6 +125,7 @@ day2Example4Fin = Prog{
   intCode=[2,4,4,5,99,9801],
   progState=Terminated,
   ip=4,
+  rb=0,
   output=[]
 }
 
@@ -129,6 +135,7 @@ day2Example5Fin = Prog{
   intCode=[30,1,1,4,2,5,6,0,99],
   progState=Terminated,
   ip=8,
+  rb=0,
   output=[]
 }
 
@@ -197,6 +204,7 @@ day5Example1Fin = Prog {
   intCode=[42,0,4,0,99],
   progState=Terminated,
   ip=4,
+  rb=0,
   output=[42]
 }
 
@@ -206,6 +214,7 @@ day5Example2Fin = Prog {
   intCode=[1002,4,3,4,99],
   progState=Terminated,
   ip=4,
+  rb=0,
   output=[]
 }
 
@@ -242,6 +251,12 @@ day9Examples = testGroup "Test examples from day 9 of AOC"
 
     , testCase "Day 9 example 3 - output large munber in the middle" $
     (output $ runProg $ newProg day9e3 []) @?= [day9e3 !! 1]
+
+    , testCase "Write value to beyond end of program" $
+    (intCode . runProg $ newProg [1101,2,3,10,99] []) @?= [1101,2,3,10,99,0,0,0,0,0,5]
+
+    , testCase "Read value to beyond end of program - should be 0" $
+    (output . runProg $ newProg [4,22,99] []) @?= [0]
   ]
 
 day9e1 :: [Int]
