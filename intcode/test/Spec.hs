@@ -149,6 +149,39 @@ day5Examples = testGroup "Test examples from day 5 of AOC"
 
     , testCase "Day 5 example 3 - input equal to 8? no" $
     (head $ output $ runProg $ newProg day5ExampleIncode3 [7]) @?= 0
+
+    , testCase "Day 5 example 4 - input less than 8? yes" $
+    (head $ output $ runProg $ newProg day5ExampleIncode4 [-20]) @?= 1
+
+    , testCase "Day 5 example 4 - input less than 8? no" $
+    (head $ output $ runProg $ newProg day5ExampleIncode4 [8]) @?= 0
+
+    , testCase "Day 5 example 4 - input less than 8? no" $
+    (head $ output $ runProg $ newProg day5ExampleIncode4 [9]) @?= 0
+
+    , testCase "Day 5 example 5 - input equal to 8? yes" $
+    (head $ output $ runProg $ newProg day5ExampleIncode5 [8]) @?= 1
+
+    , testCase "Day 5 example 5 - input equal to 8? no" $
+    (head $ output $ runProg $ newProg day5ExampleIncode5 [7]) @?= 0
+
+    , testCase "Day 5 example 6 - input less than 8? yes" $
+    (head $ output $ runProg $ newProg day5ExampleIncode6 [-20]) @?= 1
+
+    , testCase "Day 5 example 6 - input less than 8? no" $
+    (head $ output $ runProg $ newProg day5ExampleIncode6 [8]) @?= 0
+
+    , testCase "Day 5 example 6 - input less than 8? no" $
+    (head $ output $ runProg $ newProg day5ExampleIncode6 [9]) @?= 0
+
+    , testCase "Day 5 big example - input less than 8" $
+    (head $ output $ runProg $ newProg day5BigExample [7]) @?= 999
+
+    , testCase "Day 5 big example - input equal to 8" $
+    (head $ output $ runProg $ newProg day5BigExample [8]) @?= 1000
+
+    , testCase "Day 5 big example - input more than 8" $
+    (head $ output $ runProg $ newProg day5BigExample [9]) @?= 1001
   ]
 
 day5Example1Init :: Prog
@@ -177,13 +210,17 @@ day5Example2Fin = Prog {
 
 day5ExampleIncode3 :: [Int]
 day5ExampleIncode3 = [3,9,8,9,10,9,4,9,99,-1,8]
---
--- day5ExampleIncode4 :: [Int]
--- day5ExampleIncode4 = [3,9,7,9,10,9,4,9,99,-1,8]
---
--- day5ExampleIncode5 :: [Int]
--- day5ExampleIncode5 = [3,3,1108,-1,8,3,4,3,99]
---
--- day5ExampleIncode6 :: [Int]
--- day5ExampleIncode6 = [3,3,1107,-1,8,3,4,3,99]
---
+
+day5ExampleIncode4 :: [Int]
+day5ExampleIncode4 = [3,9,7,9,10,9,4,9,99,-1,8]
+
+day5ExampleIncode5 :: [Int]
+day5ExampleIncode5 = [3,3,1108,-1,8,3,4,3,99]
+
+day5ExampleIncode6 :: [Int]
+day5ExampleIncode6 = [3,3,1107,-1,8,3,4,3,99]
+
+day5BigExample :: [Int]
+day5BigExample = [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+                  1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+                  999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99]
