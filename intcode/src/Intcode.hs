@@ -7,6 +7,7 @@ module Intcode
     , setInputProg
     , consInputProg
     , scrubOutput
+    , setOutput
     ,changeRb
     ,getParam
     ,ParamMode (..)
@@ -161,6 +162,16 @@ appendInputProg i prog = Prog{
     ip = ip prog,
     rb = rb prog,
     output = output prog
+}
+
+setOutput :: [Int] -> Prog -> Prog
+setOutput o prog = Prog{
+    input = input prog,
+    intCode = intCode prog,
+    progState = progState prog,
+    ip = ip prog,
+    rb = rb prog,
+    output = o
 }
 
 consOutput :: Int -> Prog -> Prog
