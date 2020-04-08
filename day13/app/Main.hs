@@ -19,16 +19,14 @@ main = do
 
   let grid = gridDisplay . editDisplay HM.empty $ commands
 
-  _ <- mapM print (reverse grid)
-  print "done!"
+  _ <- mapM print grid
 
   -- PART 2: Run the game til all the blocks are gone
   let code2 = 2:(tail code)
-  let y = newGame code2
-  let (myScore, finalGame) = runState playGame y
+  let (myScore, finalGame) = runState playGame (newGame code2)
 
-  print "Final State"
-  print $ gameProg finalGame
+  print "Final Program State"
+  print . progState . gameProg $ finalGame
 
   let grid2 = gridDisplay $ gameDisplay finalGame
   _ <- mapM print (grid2)

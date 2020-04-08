@@ -72,9 +72,6 @@ xBall = fst . head . HM.keys . HM.filter (\v -> v == Ball)
 xPaddle :: Displ -> Int
 xPaddle = fst . head . HM.keys . HM.filter (\v -> v == Paddle)
 
-countBlocks :: Displ -> Int
-countBlocks = HM.size . HM.filter (\v -> v == Block)
-
 score :: Displ -> Int
 score displ = theScore $ displ HM.! (-1,0)
 
@@ -91,7 +88,7 @@ getTid tile tiles = case HM.lookup tile tiles of
    Just t -> t
 
 --
--- The state that matters
+-- The state that evolves, our s in s -> (a, s)
 --
 data Game = Game {
   gameProg :: IC.Prog,
@@ -110,17 +107,15 @@ newGame code = Game {
 data LiveData = LiveData {
   xb::Int,
   xp::Int,
-  sc::Int,
-  bl::Int
+  sc::Int
 } deriving(Show)
 
 stepGame' :: [Int] -> Game -> (LiveData, Game)
-stepGame' inp game = (LiveData{xb=xb',xp=xp',sc=sc',bl=bl'}, game')
+stepGame' inp game = (LiveData{xb=xb',xp=xp',sc=sc'}, game')
   where
     prog = IC.runProg (IC.setInputProg inp (gameProg game))
     displ = editDisplay (gameDisplay game) . buildCommands . reverse . IC.output $ prog
     sc' = score displ
-    bl' = countBlocks displ
     xp' = xPaddle displ
     xb' = xBall displ
     game' = Game{gameProg=(IC.scrubOutput prog), gameDisplay=displ}
@@ -143,8 +138,8 @@ playGame' inp = do
   liveData <- stepGame inp
   game <- get
   case IC.progState (gameProg game) of
-    IC.AwaitInput -> case bl liveData of
-      0 -> return $ sc liveData
-      _ -> playGame' [joystick (xb liveData) (xp liveData)]
+    IC.AwaitInput -> playGame' [joystick (xb liveData) (xp liveData)]
     _ -> return $ sc liveData
 
+
+  -- _ <- mapM print . gridDisplay $ gameDisplay game
