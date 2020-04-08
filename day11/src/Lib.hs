@@ -108,16 +108,18 @@ colourToChar Black = '.'
 colourToChar White = '#'
 
 displayRobot :: Robot -> [[Char]]
-displayRobot robot =
-  [[colourToChar $ getColour (x,y) (panels robot) | x <- [minX..maxX]] | y <- [minY..maxY]]
+-- displayRobot robot =
+  -- [[colourToChar $ getColour (x,y) (panels robot) | x <- [minX..maxX]] | y <- [minY..maxY]]
+  -- where
+  --   (minX, maxX) = (\k -> (minimum k, maximum k)) . fmap fst . HM.keys $ panels robot
+  --   (minY, maxY) = (\k -> (minimum k, maximum k)) . fmap snd . HM.keys $ panels robot
+displayRobot robot = do
+  y <- [maxY..minY]
+  return $ do
+    x <- [minX..maxX]
+    return . colourToChar $ getColour (x,y) (panels robot)
   where
     (minX, maxX) = (\k -> (minimum k, maximum k)) . fmap fst . HM.keys $ panels robot
     (minY, maxY) = (\k -> (minimum k, maximum k)) . fmap snd . HM.keys $ panels robot
--- displayRobot robot = do
---   y <- [maxY..minY]
---   return do
---     x <- [minX..maxX]
---     return . colourToChar $ getColour (x,y) (panels robot)
---   where
---     (minX, maxX) = (\k -> (minimum k, maximum k)) . fmap fst . HM.keys $ panels robot
---     (minY, maxY) = (\k -> (minimum k, maximum k)) . fmap snd . HM.keys $ panels robot
+
+

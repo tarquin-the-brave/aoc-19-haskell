@@ -2,7 +2,7 @@ module Main where
 
 import Lib
 import Data.List.Split (splitOn)
-import Control.Monad.State.Lazy (runState)
+import Control.Monad.State.Lazy (runStateT)
 import qualified Data.HashMap.Strict as HM
 
 main :: IO ()
@@ -23,7 +23,7 @@ main = do
 
   -- PART 2: Run the game til all the blocks are gone
   let code2 = 2:(tail code)
-  let (myScore, finalGame) = runState playGame (newGame code2)
+  (myScore, finalGame) <- runStateT playGame (newGame code2)
 
   print "Final Program State"
   print . progState . gameProg $ finalGame
