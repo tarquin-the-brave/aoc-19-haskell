@@ -23,6 +23,7 @@ import qualified Intcode as IC
 import qualified Data.HashMap.Strict as HM
 import Control.Monad.State.Lazy
 import Control.Monad.IO.Class
+import System.Console.ANSI
 
 data Tid = Empty | Wall | Block | Paddle | Ball | BadTid | Score{theScore::Int} deriving(Show, Eq)
 
@@ -140,8 +141,10 @@ playGame' :: [Int] -> GameIOT Int
 playGame' inp = do
   liveData <- stepGame inp
   game <- get
-  -- liftIO $ print "hello"
-  _ <- liftIO $ mapM print . gridDisplay $ gameDisplay game
+  let grid = gridDisplay $ gameDisplay game
+  _ <- liftIO $ mapM print grid
+  liftIO . print $ ("Your score: " ++ show (sc liveData))
+  liftIO . cursorUp $ (length grid) + 1
   case IC.progState (gameProg game) of
     IC.AwaitInput -> playGame' [joystick (xb liveData) (xp liveData)]
     _ -> return $ sc liveData

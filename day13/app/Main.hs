@@ -15,11 +15,7 @@ main = do
   let x' = runProg x
   let commands = buildCommands . reverse . output $ x'
 
-  print . length . filter (\i -> snd i == Block) $ commands
-
-  let grid = gridDisplay . editDisplay HM.empty $ commands
-
-  _ <- mapM print grid
+  print ("Number of blocks to kill: " ++ (show . length . filter (\i -> snd i == Block) $ commands))
 
   -- PART 2: Run the game til all the blocks are gone
   let code2 = 2:(tail code)

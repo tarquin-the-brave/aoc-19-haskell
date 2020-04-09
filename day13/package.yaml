@@ -26,6 +26,7 @@ dependencies:
 - unordered-containers
 - hashable
 - mtl
+- ansi-terminal
 
 library:
   source-dirs: src
