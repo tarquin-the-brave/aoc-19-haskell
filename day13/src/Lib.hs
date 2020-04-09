@@ -121,7 +121,7 @@ stepGame' inp game = (LiveData{xb=xb',xp=xp',sc=sc'}, game')
     xb' = xBall displ
     game' = Game{gameProg=(IC.scrubOutput prog), gameDisplay=displ}
 
-stepGame :: [Int] -> Richard LiveData
+stepGame :: [Int] -> GameIOT LiveData
 stepGame = state . stepGame'
 
 joystick :: Int -> Int -> Int
@@ -131,12 +131,12 @@ joystick ballx paddlex
   | ballx < paddlex = -1
 joystick _ _ = 0
 
-playGame :: Richard Int
+playGame :: GameIOT Int
 playGame = playGame' []
 
-type Richard a = StateT Game IO a
+type GameIOT = StateT Game IO
 
-playGame' :: [Int] -> Richard Int
+playGame' :: [Int] -> GameIOT Int
 playGame' inp = do
   liveData <- stepGame inp
   game <- get
