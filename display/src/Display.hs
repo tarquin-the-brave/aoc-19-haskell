@@ -9,6 +9,7 @@ module Display
   , Coord
   , Direction (..)
   , coordMove
+  , coordMoveN
   , turnLeft
   , turnRight
   , goBack
@@ -44,11 +45,14 @@ grid getV charFrom d = do
 
 data Direction = U | D | L | R deriving(Show)
 
+coordMoveN :: Int -> Direction -> Coord -> Coord
+coordMoveN n U (x,y) = (x, y+n)
+coordMoveN n D (x,y) = (x, y-n)
+coordMoveN n L (x,y) = (x-n, y)
+coordMoveN n R (x,y) = (x+n, y)
+
 coordMove :: Direction -> Coord -> Coord
-coordMove U (x,y) = (x, y+1)
-coordMove D (x,y) = (x, y-1)
-coordMove L (x,y) = (x-1, y)
-coordMove R (x,y) = (x+1, y)
+coordMove = coordMoveN 1
 
 turnLeft :: Direction -> Direction
 turnLeft U = L

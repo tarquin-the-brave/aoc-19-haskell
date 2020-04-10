@@ -43,3 +43,16 @@ $
 ## Revisiting This
 
 The order of the points in a wire is not needed.  We can use a HashMap.
+
+```
+$ time !!
+time stack run
+Stack has not been tested with GHC versions above 8.6, and using 8.8.3, this may fail
+Stack has not been tested with Cabal versions above 2.4, but version 3.0.1.0 was found, this may fail
+1983
+
+real    0m0.815s
+user    0m2.643s
+sys     0m1.368s
+$
+```

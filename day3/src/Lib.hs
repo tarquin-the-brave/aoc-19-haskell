@@ -1,70 +1,47 @@
 module Lib
-    ( Direction(U,D,L,R)
-    , Translation(Translation)
+    ( D.Direction(..)
+    , Translation(..)
+    , Path
     , pathCrossings
+    , sumWireLength
     ) where
 
-import Data.List
+import qualified Data.HashSet as HS
+import qualified Data.List as L
+import qualified Display as D
+import Control.Monad
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+data Translation = Translation D.Direction Int deriving(Show)
+type Path = [Translation]
 
--- Data to hold our coordinates for the points a wire passes through.
--- The direction of the wire is important as wire can only cross at 90 degrees.
-data CrossDirection = Vertical | Horizontal deriving(Eq,Show)
-data Point = Point { x::Int, y::Int, direction::CrossDirection } deriving(Show)
+pathCrossings :: Path -> Path -> [D.Coord]
+pathCrossings p1 p2 = HS.toList $ HS.intersection (points p1) (points p2)
 
-cross ::  Point -> Point -> Bool
-cross a b = (x a == x b) && (y a == y b) && (direction a /= direction b)
+points :: Path -> HS.HashSet D.Coord
+points = snd . L.foldl addPoints ((0,0), HS.empty)
 
--- The input data to our program is in the form of translation data: R6, U2, etc.
-data Direction = U | D | L | R deriving(Show)
-data Translation = Translation Direction Int deriving(Show)
+type Acc = (D.Coord, HS.HashSet D.Coord)
+addPoints :: Acc -> Translation -> Acc
+addPoints (lp, ps) (Translation d n) = foldl (addPoint d) (lp, ps) [1..n]
 
--- The list of translations given by the input define the path a wire follows,
--- we can build the wires with a function that builds up a "snail trail" of
--- Points following these translations.
---
--- We can get a section of wire leading from the point we give.
--- The last point in the produced section can go with the next translation
--- to get the next section.
-section :: Point -> Translation -> [Point]
-section point (Translation d mod) = take mod $ infiniteSection point d
+addPoint :: D.Direction -> Acc -> Int -> Acc
+addPoint d (lp, ps) _ = (newPoint, HS.insert newPoint ps)
+  where newPoint = D.coordMove d lp
 
--- Create an infinite list of points in a given direction from a point.
-infiniteSection :: Point -> Direction -> [Point]
-infiniteSection Point{x=x, y=y, direction=_} U =
-  [Point{x=x, y=y+a, direction= Vertical}| a <- [1,2..]]
-infiniteSection Point{x=x, y=y, direction=_} D =
-  [Point{x=x, y=y-a, direction= Vertical}| a <- [1,2..]]
-infiniteSection Point{x=x, y=y, direction=_} L =
-  [Point{x=x-a, y=y, direction= Horizontal}| a <- [1,2..]]
-infiniteSection Point{x=x, y=y, direction=_} R =
-  [Point{x=x+a, y=y, direction= Horizontal}| a <- [1,2..]]
+sumWireLength :: Path -> Path -> D.Coord -> Maybe Int
+sumWireLength path1 path2 point = do
+  l1 <- lineIntegral point path1
+  l2 <- lineIntegral point path2
+  return (l1 + l2)
 
--- To build a wire, we take a starting Point and list of translations
--- and create segments, with the last element in the segment being the
--- starting Point for the next segment.
-wire :: Point -> [Translation] -> [Point]
-wire point path  = foldl wireExtend [point] path
+lineIntegral :: D.Coord -> Path -> Maybe Int
+lineIntegral point path = case foldM (f point) ((0,0), 0) path of
+  Left (_, len) -> Just len
+  _ -> Nothing
 
-wireExtend :: [Point] -> Translation -> [Point]
-wireExtend w t = w ++ section (last w) t
+f :: D.Coord -> (D.Coord, Int) -> Translation -> Either (D.Coord, Int) (D.Coord, Int)
+f endP (lp, tot) (Translation d n) = foldM (f' endP) (lp, tot) $ fmap (\i -> D.coordMoveN i d lp) [1..n]
 
-wireFromOrigin :: [Translation] -> [Point]
-wireFromOrigin = wire Point{x=0, y=0, direction=Vertical}
+f' :: D.Coord -> (D.Coord, Int) -> D.Coord -> Either (D.Coord, Int) (D.Coord, Int)
+f' endP (_, tot) curP = if curP == endP then Left (curP, tot + 1) else Right (curP, tot + 1)
 
--- Wires cross when they contain Points that cross.
-wireCrossings :: [Point] -> [Point] -> [(Point, Point)]
-wireCrossings w1 w2 = filter (\(x, y) -> cross x y) ((\x y-> (x, y)) <$> w1 <*> w2)
-
--- Pull out the coordinates of crossing points as tuples,
--- so we don't need to expose the Point data aggregate
--- outside this module.
-wireCrossCoordinates :: [Point] -> [Point] -> [(Int, Int)]
-wireCrossCoordinates w1 w2 = map (\(p, _)-> (x p, y p)) $ wireCrossings w1 w2
-
--- Now express this data in terms of the paths that
--- are the input to our program
-pathCrossings :: [Translation] -> [Translation] -> [(Int, Int)]
-pathCrossings p1 p2 = wireCrossCoordinates (wireFromOrigin p1) (wireFromOrigin p2)
