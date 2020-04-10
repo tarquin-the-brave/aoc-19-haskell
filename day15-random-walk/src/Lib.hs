@@ -5,7 +5,7 @@ module Lib
     , runDroid'
     ) where
 
-import qualified IntcodeImport as IC
+import qualified IntcodeRenamed as IC
   ( new
   , run
   , ProgState (..)

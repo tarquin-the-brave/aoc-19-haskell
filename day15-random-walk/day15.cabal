@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0275b227e91d8ed2e9d2b580d5fc88968f8044d812b958783655b7103709b63a
+-- hash: dbdc024d738faeb8284894b5115c5148fe8cc3e75d7c8e3c6b55a906e16132b0
 
 name:           day15
 version:        0.1.0.0
@@ -27,8 +27,6 @@ source-repository head
 
 library
   exposed-modules:
-      Display
-      IntcodeImport
       Lib
   other-modules:
       Paths_day15
@@ -38,8 +36,10 @@ library
       ansi-terminal
     , base >=4.7 && <5
     , concurrent-extra
+    , display
     , hashable
     , intcode
+    , intcode-renamed
     , mtl
     , random
     , split
@@ -59,8 +59,10 @@ executable day15-exe
     , base >=4.7 && <5
     , concurrent-extra
     , day15
+    , display
     , hashable
     , intcode
+    , intcode-renamed
     , mtl
     , random
     , split
@@ -81,8 +83,10 @@ test-suite day15-test
     , base >=4.7 && <5
     , concurrent-extra
     , day15
+    , display
     , hashable
     , intcode
+    , intcode-renamed
     , mtl
     , random
     , split

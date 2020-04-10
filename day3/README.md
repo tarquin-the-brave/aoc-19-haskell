@@ -40,3 +40,6 @@ $
 
 , that's a lot.
 
+## Revisiting This
+
+The order of the points in a wire is not needed.  We can use a HashMap.

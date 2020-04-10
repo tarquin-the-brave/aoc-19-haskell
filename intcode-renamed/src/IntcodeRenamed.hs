@@ -1,7 +1,4 @@
--- In the knowledge that Lib will do a qualified import
--- of the Intcode funtions, Let's rename them here to make
--- life easier.
-module IntcodeImport
+module IntcodeRenamed
   ( new
   , run
   , IC.Prog (..)
