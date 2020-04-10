@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 46ebbb654148e918dda9c980ca40d742f0376e8783a8352b38b73d4af6f7fac3
+-- hash: 0275b227e91d8ed2e9d2b580d5fc88968f8044d812b958783655b7103709b63a
 
 name:           day15
 version:        0.1.0.0
@@ -35,9 +35,15 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      ansi-terminal
+    , base >=4.7 && <5
+    , concurrent-extra
     , hashable
     , intcode
+    , mtl
+    , random
+    , split
+    , unbounded-delays
     , unordered-containers
   default-language: Haskell2010
 
@@ -49,10 +55,16 @@ executable day15-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      ansi-terminal
+    , base >=4.7 && <5
+    , concurrent-extra
     , day15
     , hashable
     , intcode
+    , mtl
+    , random
+    , split
+    , unbounded-delays
     , unordered-containers
   default-language: Haskell2010
 
@@ -65,9 +77,15 @@ test-suite day15-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      ansi-terminal
+    , base >=4.7 && <5
+    , concurrent-extra
     , day15
     , hashable
     , intcode
+    , mtl
+    , random
+    , split
+    , unbounded-delays
     , unordered-containers
   default-language: Haskell2010

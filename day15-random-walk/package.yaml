@@ -24,6 +24,12 @@ dependencies:
 - intcode
 - unordered-containers
 - hashable
+- mtl
+- split
+- concurrent-extra
+- unbounded-delays
+- random
+- ansi-terminal
 
 library:
   source-dirs: src
