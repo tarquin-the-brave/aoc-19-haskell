@@ -1,6 +1,7 @@
 module Lib
     ( ruleOne
     , ruleTwo
+    , ruleThree
     , generalFoldFunction
     ) where
 
@@ -27,4 +28,19 @@ survivalFold f init x = foldl (generalFoldFunction f) (Just init) . show $ x
 generalFoldFunction :: Eq a => (a -> a -> Bool) -> Maybe a -> a -> Maybe a
 generalFoldFunction _ Nothing _ = Nothing
 generalFoldFunction f (Just x) y = if (f x y) then Nothing else Just y
+
+-- PART 2: adjacent digits can't be part of a larger group.
+ruleThree :: Integral a => Show a => a -> Bool
+ruleThree num = (length twosomes) > 0
+  where
+    twosomes = [x | x <- adjacents, length x == 2]
+    adjacents = (\(x,y) -> x:y) . gatherAdjacents . show $ num
+
+gatherAdjacents :: String -> (String, [String])
+gatherAdjacents = foldl foldFun ("0", [])
+  where
+    foldFun acc x = if x == (head . fst $ acc) then
+      (x:(fst acc), snd acc)
+    else
+      ([x], (fst acc):(snd acc))
 

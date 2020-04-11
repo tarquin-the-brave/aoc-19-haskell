@@ -47,3 +47,14 @@ Just 40
 ^CInterrupted.
 *Main Lib>
 ```
+
+# Revisiting
+
+I explored these ideas of a "survival fold" a bit more in a [blog
+post](https://tarquin-the-brave.github.io/blog/posts/re-learning-haskell/).
+`foldM` is the answer.
+
+I also somehow missed that this had a part 2.  I went back and did that with
+some garbage fold.
+
+I'll cycle back round to fix this more elegantly later.
