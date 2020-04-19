@@ -60,6 +60,7 @@ replaceNth n newVal xs
   | n < length xs = return $ replaceNthInner n newVal xs
   | n == length xs = return $ xs ++ [newVal]
   | n > length xs = return $ xs ++ [0 | _ <- [1..(n - length xs)]] ++ [newVal]
+  | otherwise = fail "compiler told me this was missing, not sure what isn't covered above..."
 
 replaceNthInner :: Int -> a -> [a] -> [a]
 replaceNthInner _ _ [] = []
@@ -85,13 +86,13 @@ getParam (Rel base) idx xs = do
 
 data OpCode = One | Two | Three | Four | Five | Six | Seven | Eight | Nine | NinetyNine deriving(Show)
 
-parseModesCode :: MonadFail m => Int -> Int -> m (ParamMode, ParamMode, ParamMode, OpCode)
+parseModesCode :: MonadFail m => Int -> Int -> m (OpCode, ParamMode, ParamMode, ParamMode)
 parseModesCode relbase num = do
   op <- parseOpCode $ num `mod` 100
   m1 <- parseParamMode relbase $ num `div` 100 `mod` 10
   m2 <- parseParamMode relbase $ num `div` 1000 `mod` 10
   m3 <- parseParamMode relbase $ num `div` 10000 `mod` 10
-  return (m1, m2, m3, op)
+  return (op, m1, m2, m3)
 
 parseOpCode :: MonadFail m => Int -> m OpCode
 parseOpCode num

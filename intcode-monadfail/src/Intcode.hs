@@ -7,7 +7,7 @@ module Intcode
 import Intcode.Data
 import Intcode.Operations
 
-currentOpCode :: MonadFail m => Intcode -> m (ParamMode, ParamMode, ParamMode, OpCode)
+currentOpCode :: MonadFail m => Intcode -> m (OpCode, ParamMode, ParamMode, ParamMode)
 currentOpCode ic = do
   c <- (code ic) !!! (ip ic)
   parseModesCode (rb ic) c
