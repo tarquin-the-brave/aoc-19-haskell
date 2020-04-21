@@ -1,6 +1,6 @@
 module Intcode.Data
     ( Intcode (..)
-    , new
+    , newIC
     , moveIp
     , setIp
     , changeRb
@@ -27,8 +27,8 @@ data Intcode = Intcode {
   output::[Int]
 } deriving(Show, Eq)
 
-new :: [Int] -> [Int] -> Intcode
-new newCode newInput = Intcode{
+newIC :: [Int] -> [Int] -> Intcode
+newIC newCode newInput = Intcode{
   input = newInput,
   code = newCode,
   ip = 0,

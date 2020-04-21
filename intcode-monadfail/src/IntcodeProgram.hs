@@ -1,8 +1,15 @@
 module IntcodeProgram
-  ( run ) where
+  ( new
+  , run
+  , Prog (..)
+  , Intcode (..)
+  ) where
 
 import Intcode
 import Program
+
+new :: [Int] -> [Int] -> Prog Intcode
+new ic i = return $ newIC ic i
 
 run :: Prog Intcode -> Prog Intcode
 run (Running ic) = run . runInstruction $ (ic)

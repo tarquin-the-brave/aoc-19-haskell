@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d90268d1d4b28411d076052db7fac153c999930b196d348dc40b5e695244bc15
+-- hash: d10d1ff9289284fa8d1c4e374c960eba666e8e7d6522bbb9c86a8113ae92a898
 
 name:           intcode-monadfail
 version:        0.1.0.0
@@ -55,4 +55,7 @@ test-suite intcode-monadfail-test
     , intcode-monadfail
     , listsafe
     , mtl
+    , split
+    , tasty
+    , tasty-hunit
   default-language: Haskell2010

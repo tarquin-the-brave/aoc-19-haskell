@@ -37,3 +37,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - intcode-monadfail
+    - tasty
+    - tasty-hunit
+    - split
