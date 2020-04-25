@@ -39,4 +39,5 @@ tests:
     - intcode-monadfail
     - tasty
     - tasty-hunit
+    - tasty-laws >= 0.3.2
     - split

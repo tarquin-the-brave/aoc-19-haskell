@@ -3,6 +3,9 @@ import qualified IntcodeProgram as IC
 import Test.Tasty
 import Test.Tasty.HUnit
 import Data.List.Split (splitOn)
+import qualified Test.Tasty.Laws.Applicative as A
+import qualified Test.Tasty.Laws.Functor as F
+import qualified Test.Tasty.Laws.Monad as M
 
 main :: IO()
 main = do
@@ -20,20 +23,25 @@ functionalTests ic = testGroup "Tests of intcode computer function"
   ]
 
 testLaws :: TestTree
--- testLaws = testGroup "Test Functor, Applicative, & MOnad laws" [testF, testA, testM]
 testLaws = testGroup "Test Functor, Applicative, & Monad laws" [testF]
+-- testLaws = testGroup "Test Functor, Applicative, & Monad laws" [testF, testA, testM]
 
 testF :: TestTree
--- testF = testGroup "Functor Laws" [fLaw1, fLaw2]
-testF = testGroup "Functor Laws" [fLaw1]
-
-fLaw1 :: TestTree
-fLaw1 = testGroup "Law 1: fmap id = id"
+testF = testGroup "Functor Laws (Unit)"
   [
-    testCase "Running varient" $
-    (fmap id $ IC.Running ()) @?= (id $ IC.Running ())
-
-    , testCase "Crashed varient" $
-    (fmap id $ IC.Crashed "woops") @?= ((id $ IC.Crashed "woops")::IC.Prog ())
+    F.testUnit [IC.Running (), IC.AwaitInput (), IC.End (), IC.Crashed "woops"]
   ]
+
+-- testA :: TestTree
+-- testA = testGroup "Applicative Laws (Unit)"
+--   [
+--     A.testUnit [IC.Running (), IC.AwaitInput (), IC.End (), IC.Crashed "woops"]
+--   ]
+
+-- testM :: TestTree
+-- testM = testGroup "Monad Laws (Unit)"
+--   [
+--     M.testUnit [IC.Running (), IC.AwaitInput (), IC.End (), IC.Crashed "woops"]
+--   ]
+--
 
