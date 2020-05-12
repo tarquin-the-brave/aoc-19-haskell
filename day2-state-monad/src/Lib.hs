@@ -2,7 +2,7 @@ module Lib
     ( runIntcode
     ) where
 
-import Control.Monad.State.Lazy
+import           Control.Monad.State.Lazy
 
 runIntcode :: [Int] -> Int
 runIntcode input = head . program $ execState runProgram Program{program = input, programState = Running, progressIndex = 0}

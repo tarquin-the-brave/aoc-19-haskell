@@ -1,9 +1,9 @@
 module Main where
 
-import Lib
-import Data.List.Split
-import Text.Read
-import Control.Monad.Fail
+import           Control.Monad.Fail
+import           Data.List.Split
+import           Lib
+import           Text.Read
 
 main :: IO ()
 main = do
@@ -21,7 +21,7 @@ main = do
 
       -- PART 2: Intersection with the smallest travel down wires.
       case sequence $ fmap (sumWireLength path1 path2) crossings of
-        Nothing -> print "crossing points weren't found on wires"
+        Nothing          -> print "crossing points weren't found on wires"
         Just wireLengths -> print $ minimum wireLengths
 
     Nothing -> print "input parsing failure"
@@ -34,7 +34,7 @@ parseDirection 'U' = Just U
 parseDirection 'D' = Just D
 parseDirection 'L' = Just L
 parseDirection 'R' = Just R
-parseDirection _ = Nothing
+parseDirection _   = Nothing
 
 pathsRead :: [[String]] -> [[Maybe Translation]]
 pathsRead = fmap (fmap parseTranslation)

@@ -1,9 +1,9 @@
 module Main where
 
-import Lib
-import Data.List.Split (splitOn)
-import Control.Monad.State.Lazy (runStateT)
-import qualified Data.HashMap.Strict as HM
+import           Control.Monad.State.Lazy (runStateT)
+import qualified Data.HashMap.Strict      as HM
+import           Data.List.Split          (splitOn)
+import           Lib
 
 main :: IO ()
 main = do

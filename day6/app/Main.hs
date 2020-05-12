@@ -1,10 +1,10 @@
 module Main where
 
-import Lib
-import Data.Tree
-import Data.List.Split (splitOn)
-import qualified Data.List.Safe as Safe
-import qualified Data.HashSet as HS
+import qualified Data.HashSet    as HS
+import qualified Data.List.Safe  as Safe
+import           Data.List.Split (splitOn)
+import           Data.Tree
+import           Lib
 
 main :: IO ()
 main = do

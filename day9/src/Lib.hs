@@ -5,5 +5,5 @@ module Lib
     , ProgState (..)
 ) where
 
-import Intcode
+import           Intcode
 

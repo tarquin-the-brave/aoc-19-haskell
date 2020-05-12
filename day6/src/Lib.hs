@@ -5,8 +5,8 @@ module Lib
     , orbitalHops
     ) where
 
-import Data.List (genericLength)
-import Data.Tree
+import           Data.List (genericLength)
+import           Data.Tree
 
 -- Which bodies do not orbit anything?
 roots :: Eq a => [(a,a)] -> [a]
@@ -41,6 +41,6 @@ orbitalHops orbs n1 n2 = (HS.size onlyInPath1) + (HS.size onlyInPath2) - 2
         nodeName
       else
         case Safe.head [acc | acc <- childAccs, length acc > 0] of
-          Nothing -> ""
+          Nothing   -> ""
           Just path -> nodeName ++ "," ++ path
 

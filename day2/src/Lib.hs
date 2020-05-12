@@ -11,7 +11,7 @@ data Program = Program {program::[Int], state::RunState, progressIndex::Int} der
 runProgram :: Program -> Program
 runProgram prog = case state prog of
    Running -> runProgram . runStep $ prog
-   _ -> prog
+   _       -> prog
 
 runStep :: Program -> Program
 runStep prog

@@ -1,7 +1,7 @@
 module Main where
 
-import Lib (runIntcode)
-import Data.List.Split (splitOn)
+import           Data.List.Split (splitOn)
+import           Lib             (runIntcode)
 
 main :: IO ()
 main = do

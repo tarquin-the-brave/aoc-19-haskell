@@ -1,10 +1,10 @@
 module Main where
 
-import Lib
-import Data.List.Split (splitOn)
-import Data.List (permutations)
-import Control.Monad (foldM)
-import Control.Monad.State.Lazy (runState, evalState)
+import           Control.Monad            (foldM)
+import           Control.Monad.State.Lazy (evalState, runState)
+import           Data.List                (permutations)
+import           Data.List.Split          (splitOn)
+import           Lib
 
 main :: IO ()
 main = do
@@ -47,6 +47,6 @@ maxOutFoldFunc :: Maybe (Int, [Int]) -> (Maybe Int, [Int]) -> Maybe (Int, [Int])
 maxOutFoldFunc acc x = do
   acc <- acc
   case fst x of
-    Nothing -> return acc
+    Nothing   -> return acc
     Just xOut -> return (if (xOut > fst acc) then (xOut, snd x) else acc)
 

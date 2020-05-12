@@ -8,8 +8,8 @@ module Lib
     , newAmps
     , runAmpsLoop) where
 
-import Intcode
-import Control.Monad.State.Lazy
+import           Control.Monad.State.Lazy
+import           Intcode
 
 -- In part 1 we didn't car about keeping the state from running
 -- each amplifyer, so we can take the output of finishedProg

@@ -1,7 +1,7 @@
 module Main where
 
-import Lib
-import Data.List
+import           Data.List
+import           Lib
 
 main :: IO ()
 main = do

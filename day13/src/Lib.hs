@@ -13,17 +13,13 @@ module Lib
     , newGame
 ) where
 
-import qualified Intcode as IC
-  ( newProg
-  , runProg
-  , Prog (..)
-  , ProgState (..)
-  , setInputProg
-  , scrubOutput)
-import qualified Data.HashMap.Strict as HM
-import Control.Monad.State.Lazy
-import Control.Monad.IO.Class
-import System.Console.ANSI
+import           Control.Monad.IO.Class
+import           Control.Monad.State.Lazy
+import qualified Data.HashMap.Strict      as HM
+import qualified Intcode                  as IC (Prog (..), ProgState (..),
+                                                 newProg, runProg, scrubOutput,
+                                                 setInputProg)
+import           System.Console.ANSI
 
 data Tid = Empty | Wall | Block | Paddle | Ball | BadTid | Score{theScore::Int} deriving(Show, Eq)
 
@@ -36,12 +32,12 @@ tidFromInt 4 = Ball
 tidFromInt _ = BadTid
 
 tidToChar :: Tid -> Char
-tidToChar Empty = ' '
-tidToChar Wall = '|'
-tidToChar Block = '#'
-tidToChar Paddle = '='
-tidToChar Ball = 'o'
-tidToChar BadTid = 'X'
+tidToChar Empty               = ' '
+tidToChar Wall                = '|'
+tidToChar Block               = '#'
+tidToChar Paddle              = '='
+tidToChar Ball                = 'o'
+tidToChar BadTid              = 'X'
 tidToChar (Score{theScore=_}) = 'Z'
 
 type Tile = (Int, Int)
@@ -87,13 +83,13 @@ gridDisplay tiles =
 getTid :: Tile -> Displ -> Tid
 getTid tile tiles = case HM.lookup tile tiles of
    Nothing -> Empty
-   Just t -> t
+   Just t  -> t
 
 --
 -- The state that evolves, our s in s -> (a, s)
 --
 data Game = Game {
-  gameProg :: IC.Prog,
+  gameProg    :: IC.Prog,
   gameDisplay :: Displ
 } deriving(Show)
 
@@ -147,6 +143,6 @@ playGame' inp = do
   liftIO . cursorUp $ (length grid) + 1
   case IC.progState (gameProg game) of
     IC.AwaitInput -> playGame' [joystick (xb liveData) (xp liveData)]
-    _ -> return $ sc liveData
+    _             -> return $ sc liveData
 
 

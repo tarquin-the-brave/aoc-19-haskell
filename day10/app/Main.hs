@@ -1,12 +1,12 @@
 module Main where
 
 -- import Lib
-import qualified Display as D
-import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
-import qualified Data.List as L
-import Diagrams.Angle
-import Control.Monad.State.Lazy
+import           Control.Monad.State.Lazy
+import qualified Data.List                as L
+import qualified Data.Map.Strict          as Map
+import qualified Data.Set                 as Set
+import           Diagrams.Angle
+import qualified Display                  as D
 
 main :: IO ()
 main = do

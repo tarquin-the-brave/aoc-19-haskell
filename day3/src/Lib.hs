@@ -6,10 +6,10 @@ module Lib
     , sumWireLength
     ) where
 
-import qualified Data.HashSet as HS
-import qualified Data.List as L
-import qualified Display as D
-import Control.Monad
+import           Control.Monad
+import qualified Data.HashSet  as HS
+import qualified Data.List     as L
+import qualified Display       as D
 
 data Translation = Translation D.Direction Int deriving(Show)
 type Path = [Translation]
@@ -37,7 +37,7 @@ sumWireLength path1 path2 point = do
 lineIntegral :: D.Coord -> Path -> Maybe Int
 lineIntegral point path = case foldM (f point) ((0,0), 0) path of
   Left (_, len) -> Just len
-  _ -> Nothing
+  _             -> Nothing
 
 f :: D.Coord -> (D.Coord, Int) -> Translation -> Either (D.Coord, Int) (D.Coord, Int)
 f endP (lp, tot) (Translation d n) = foldM (f' endP) (lp, tot) $ fmap (\i -> D.coordMoveN i d lp) [1..n]
