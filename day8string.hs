@@ -1,20 +1,17 @@
 #!/usr/bin/env stack
 -- stack --resolver lts-15.4 script
-{-# LANGUAGE OverloadedStrings #-}
-
-import qualified Data.Text.IO as TIO
-import qualified Data.Text.Lazy as T
+import Data.List.Split (chunksOf)
 
 main :: IO ()
 main = do
-  contents <- TIO.readFile "day8-input.txt"
-  let layers = T.chunksOf (25*6) . head . T.lines . T.fromStrict $ contents
+  contents <- readFile "day8-input.txt"
+  let layers = chunksOf (25*6) . head . lines $ contents
 
   -- Part 1: product of the number of '2's and '1's for the layer with the fewest '0's
-  print $  sndMinFst . fmap (\l -> (T.count "0" l, (T.count "1" l) * (T.count "2" l))) $ layers
+  print $  sndMinFst . fmap (\l -> (count '0' l, (count '1' l) * (count '2' l))) $ layers
 
   -- Part 2: print out the message. Top layer first.
-  mapM_ print . T.chunksOf 25 . T.map displayChar . foldl1 (T.zipWith overlayChar) $ layers
+  mapM_ print . chunksOf 25 . map displayChar . foldl1 (zipWith overlayChar) $ layers
 
   where
     -- Convert the pixels to make the message easier to see.
@@ -22,6 +19,7 @@ main = do
     -- 1: white -> 'X'
     displayChar c = if c == '1' then 'X' else ' '
     overlayChar c d = if c == '2' then d else c
+    count c = foldl (\acc x -> if x == c then acc + 1 else acc) 0
 
     sndMinFst :: Ord a => [(a , b)] -> b
     sndMinFst = snd . foldl1 (\acc x -> if fst x < fst acc then x else acc)

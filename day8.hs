@@ -5,7 +5,6 @@
 import Data.List (foldl1')
 import qualified Data.Text.IO as TIO
 import qualified Data.Text as T
-import Data.Monoid ((<>))
 
 main :: IO ()
 main = do
