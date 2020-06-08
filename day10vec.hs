@@ -4,7 +4,6 @@
 {-# LANGUAGE BangPatterns #-}
 
 import           Control.Monad.State.Lazy
-import qualified Data.List                as L
 import qualified Data.Map.Strict          as Map
 import qualified Data.Set                 as Set
 import           Diagrams.Angle (Angle, atan2A)
