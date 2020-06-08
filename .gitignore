@@ -13,6 +13,7 @@ day*
 !day8string.hs
 !day9/
 !day10.hs
+!day10vec.hs
 !day11/
 !day13/
 !day15-random-walk/
