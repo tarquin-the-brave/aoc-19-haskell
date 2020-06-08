@@ -3,12 +3,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Data.List (foldl1')
-import qualified Data.Text.IO as TIO
+import qualified Data.Text.Encoding as TE
 import qualified Data.Text as T
+import qualified Data.ByteString as B
 
 main :: IO ()
 main = do
-  contents <- TIO.readFile "day8-input.txt"
+  contents <- fmap TE.decodeUtf8 . B.readFile $ "day8-input.txt"
   let layers = T.chunksOf (25*6) . head . T.lines $ contents
 
   -- Part 1: product of the number of '2's and '1's for the layer with the fewest '0's

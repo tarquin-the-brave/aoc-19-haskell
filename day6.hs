@@ -7,13 +7,14 @@ import qualified Data.List.Safe  as Safe
 import           Data.List (genericLength)
 import qualified Data.Tree as T
 import           Data.Foldable (foldl')
-import qualified Data.Text.IO as TIO
+import qualified Data.Text.Encoding as TE
+import qualified Data.ByteString as B
 import qualified Data.Text as Txt
 import Data.Monoid ((<>))
 
 main :: IO ()
 main = do
-  contents <- fmap Txt.lines . TIO.readFile $ "day6-input.txt"
+  contents <- fmap (Txt.lines . TE.decodeUtf8) . B.readFile $ "day6-input.txt"
   let orbits = fmap parseOrbit contents
 
   let orbitForest = T.unfoldForest (forestBuilder orbits) (roots orbits)

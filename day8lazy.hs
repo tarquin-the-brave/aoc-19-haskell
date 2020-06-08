@@ -2,13 +2,14 @@
 -- stack --resolver lts-15.4 script
 {-# LANGUAGE OverloadedStrings #-}
 
-import qualified Data.Text.IO as TIO
+import qualified Data.Text.Lazy.Encoding as TE
 import qualified Data.Text.Lazy as T
+import qualified Data.ByteString.Lazy as B
 
 main :: IO ()
 main = do
-  contents <- TIO.readFile "day8-input.txt"
-  let layers = T.chunksOf (25*6) . head . T.lines . T.fromStrict $ contents
+  contents <- fmap TE.decodeUtf8 . B.readFile $ "day8-input.txt"
+  let layers = T.chunksOf (25*6) . head . T.lines $ contents
 
   -- Part 1: product of the number of '2's and '1's for the layer with the fewest '0's
   print $  sndMinFst . fmap (\l -> (T.count "0" l, (T.count "1" l) * (T.count "2" l))) $ layers

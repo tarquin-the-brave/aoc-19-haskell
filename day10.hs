@@ -1,4 +1,5 @@
-module Main where
+#!/usr/bin/env stack
+-- stack --resolver lts-15.4 script --package mtl --package containers --package diagrams-lib
 
 -- import Lib
 import           Control.Monad.State.Lazy
@@ -6,12 +7,10 @@ import qualified Data.List                as L
 import qualified Data.Map.Strict          as Map
 import qualified Data.Set                 as Set
 import           Diagrams.Angle
-import qualified Display                  as D
 
 main :: IO ()
 main = do
-  -- contents <- readFile "input-example-5.txt"
-  contents <- readFile "input.txt"
+  contents <- readFile "day10-input.txt"
   let points = getPoints $ lines contents
   let pointSet = Set.fromList points
   let pointsWithAst = filter pAst points
@@ -53,7 +52,7 @@ asteroidsSeen = Map.size . Map.filter pointsHaveAst
 pointsHaveAst :: [Point] -> Bool
 pointsHaveAst = any id . fmap pAst
 
-maxSnd :: [(D.Coord , Int)] -> (D.Coord, Int)
+maxSnd :: [((Int, Int), Int)] -> ((Int, Int), Int)
 maxSnd = foldl (\acc x -> if snd x > snd acc then x else acc) ((0,0), 0)
 
 sortRayPoints :: Point -> Rays -> Rays
@@ -69,12 +68,6 @@ shoot' count rays = ((asteroid, count + 1), newRays)
     asteroid = head ray
     remainingRay = tail ray
     newRays = Map.insert angle remainingRay rays
-    -- NOT ROBUST AGAINST FULL ROTATION
-    -- newRays = if remainingRay == []
-    --   then
-    --     Map.delete angle rays
-    --   else
-    --     Map.insert angle remainingRay rays
 
 shoot :: Int -> State Rays (Point, Int)
 shoot = state . shoot'
@@ -89,17 +82,3 @@ shootUntil imax i = do
 
 vapourize :: Int -> Rays -> Point
 vapourize n = evalState (shootUntil (n) 0)
-
--- Got into a right kurfuffle trying to manage verticals as Infinity from Fractional
--- Implemented my own instead.
---
--- data Num a => Point a = Point {px::a, py::a, pAst::Bool} deriving(Show, Eq, Ord)
--- getPoints :: Num a => Enum a => [[Char]] -> [Point a]
--- raysFromPoint :: Eq d => Num a => Fractional d => Point a -> Set.Set (Point a) -> Rays d a
--- raysFromPoint p0 = foldl (\rays p -> rayInsert (fractionalDir p0 p) [p] rays) Map.empty
--- fractionalDir :: Fractional a => Fractional d => Point a -> Point a -> d
--- fractionalDir p0 p = ((py p) - (py p0))/((px p) - (px p0))
--- rayInsert :: Eq d => Num a => Fractional d => d -> [Point a] -> Rays d a -> Rays d a
--- rayInsert = Map.insertWith (\p ps -> p ++ ps)
--- asteroidsSeen :: Num a => Rays d a -> Int
--- pointsHaveAst :: Num a => [Point a] -> Bool
