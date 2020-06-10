@@ -1,5 +1,6 @@
 #!/usr/bin/env stack
 -- stack --resolver lts-15.4 script --package mtl --package containers --package diagrams-lib
+{-# LANGUAGE BangPatterns #-}
 
 -- import Lib
 import           Control.Monad.State.Lazy
@@ -23,7 +24,7 @@ main = do
 
   -- PART 2: Spinning lazer
   let ourPoint = Point { px = fst $ fst ourMax, py = snd $ fst ourMax, pAst = True }
-  let ourRaysWithAsteroids = Map.filter (/=[]) . Map.map (\ps -> [p|p<-ps, pAst p]) . raysFromPoint ourPoint $ Set.delete ourPoint pointSet
+  let ourRaysWithAsteroids = Map.filter (/=[]) . Map.map (filter pAst) . raysFromPoint ourPoint $ Set.delete ourPoint pointSet
   let raysSorted = sortRayPoints ourPoint ourRaysWithAsteroids
 
   print $ Map.size raysSorted
@@ -31,26 +32,20 @@ main = do
   print $ vapourize 200 raysSorted
 
 
-data Point = Point {px::Int, py::Int, pAst::Bool} deriving(Show, Eq, Ord)
+data Point = Point {px :: !Int, py :: !Int, pAst :: !Bool} deriving(Show, Eq, Ord)
 type Rays = Map.Map (Angle Float) [Point]
 
 getPoints :: [[Char]] -> [Point]
-getPoints = L.intercalate [] . fmap (\(y, row) -> fmap (\(x, b) -> Point{px=x,py=y,pAst=b}) row) . zip [0..] . fmap (zip [0..]) . fmap (fmap (=='#'))
+getPoints = concat . fmap (\(y, row) -> fmap (\(x, b) -> Point{px=x,py=y,pAst=b}) row) . zip [0..] . fmap (zip [0..]) . fmap (fmap (=='#'))
 
 raysFromPoint :: Point -> Set.Set Point -> Rays
-raysFromPoint p0 = foldl (\rays p -> rayInsert (angleFromPoints p0 p) [p] rays) Map.empty
+raysFromPoint p0 = foldl (\rays p -> Map.insertWith (++) (angleFromPoints p0 p) [p] rays) Map.empty
 
 angleFromPoints :: Point -> Point -> Angle Float
 angleFromPoints p0 p = fmap (*(-1)) $ atan2A (fromIntegral ((px p) - (px p0))) (fromIntegral ((py p) - (py p0)))
 
-rayInsert :: Angle Float -> [Point] -> Rays -> Rays
-rayInsert = Map.insertWith (\p ps -> p ++ ps)
-
 asteroidsSeen :: Rays -> Int
-asteroidsSeen = Map.size . Map.filter pointsHaveAst
-
-pointsHaveAst :: [Point] -> Bool
-pointsHaveAst = any id . fmap pAst
+asteroidsSeen = Map.size . Map.filter (any pAst)
 
 maxSnd :: [((Int, Int), Int)] -> ((Int, Int), Int)
 maxSnd = foldl (\acc x -> if snd x > snd acc then x else acc) ((0,0), 0)

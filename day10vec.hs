@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BangPatterns #-}
 
-import           Control.Monad.State.Lazy
+import           Control.Monad.State
 import qualified Data.Map.Strict          as Map
 import qualified Data.Set                 as Set
 import           Diagrams.Angle (Angle, atan2A)
@@ -49,10 +49,7 @@ angleFromPoints :: Point -> Point -> Angle Float
 angleFromPoints p0 p = fmap (*(-1)) $ atan2A (fromIntegral ((px p) - (px p0))) (fromIntegral ((py p) - (py p0)))
 
 asteroidsSeen :: Rays -> Int
-asteroidsSeen = Map.size . Map.filter pointsHaveAst
-
-pointsHaveAst :: Foldable f => Functor f => f Point -> Bool
-pointsHaveAst = any id . fmap pAst
+asteroidsSeen = Map.size . Map.filter (any pAst)
 
 maxSnd :: V.Vector ((Int, Int), Int) -> ((Int, Int), Int)
 maxSnd = V.foldl1 (\acc x -> if snd x > snd acc then x else acc)
