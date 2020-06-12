@@ -1,6 +1,15 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Intcode.Data
-    ( Intcode (..)
+    ( Intcode
+    -- Intcode Lenses
+    , input
+    , code
+    , ip
+    , rb
+    , output
+    -- init
     , newIC
+    -- old code
     , moveIp
     , setIp
     , changeRb
@@ -14,120 +23,64 @@ module Intcode.Data
     , scrubOutput
     ) where
 
+import Lens.Micro.Platform (makeLenses, over, set)
+
 --
 -- Intcode data
 --
-data Intcode = Intcode {
-  input::[Int],
-  code::[Int],
+data Intcode = Intcode
+  { _input::[Int]
+  , _code::[Int]
   -- ip: Instruction Pointer
-  ip::Int,
+  , _ip::Int
   -- rb: Relative Base
-  rb::Int,
-  output::[Int]
-} deriving(Show, Eq)
+  , _rb::Int
+  , _output::[Int]
+  } deriving(Show, Eq)
+
+makeLenses ''Intcode
 
 newIC :: [Int] -> [Int] -> Intcode
 newIC newCode newInput = Intcode{
-  input = newInput,
-  code = newCode,
-  ip = 0,
-  rb = 0,
-  output = []
+  _input = newInput,
+  _code = newCode,
+  _ip = 0,
+  _rb = 0,
+  _output = []
 }
 
 moveIp :: Int -> Intcode -> Intcode
-moveIp i ic = setIp (i + ip ic) ic
+moveIp i = over ip (+i)
 
 setIp :: Int -> Intcode -> Intcode
-setIp i ic = Intcode{
-    input = input ic,
-    code = code ic,
-    ip = i,
-    rb = rb ic,
-    output = output ic
-}
+setIp = set ip
 
 changeRb :: Int -> Intcode -> Intcode
-changeRb b ic = Intcode{
-    input = input ic,
-    code = code ic,
-    ip = ip ic,
-    rb = (rb ic) + b,
-    output = output ic
-}
+changeRb b = over rb (+b)
 
 updateCode :: [Int] -> Intcode -> Intcode
-updateCode newIntCode ic = Intcode{
-    input = input ic,
-    code = newIntCode,
-    ip = ip ic,
-    rb = rb ic,
-    output = output ic
-}
+updateCode newIntCode = set code newIntCode
 
 -- unsafe
 tailInput :: Intcode -> Intcode
-tailInput ic = Intcode{
-    input = tail $ input ic,
-    code = code ic,
-    ip = ip ic,
-    rb = rb ic,
-    output = output ic
-}
+tailInput = over input tail
 
 setInput :: [Int] -> Intcode -> Intcode
-setInput i ic = Intcode{
-    input = i,
-    code = code ic,
-    ip = ip ic,
-    rb = rb ic,
-    output = output ic
-}
+setInput = set input
 
 consInput :: Int -> Intcode -> Intcode
-consInput i ic = Intcode{
-    input = i:(input ic),
-    code = code ic,
-    ip = ip ic,
-    rb = rb ic,
-    output = output ic
-}
+consInput i = over input (\inp -> i:inp)
 
 appendInput :: Int -> Intcode -> Intcode
-appendInput i ic = Intcode{
-    input = (input ic) ++ [i],
-    code = code ic,
-    ip = ip ic,
-    rb = rb ic,
-    output = output ic
-}
+appendInput i = over input (\inp -> inp ++ [i])
 
 setOutput :: [Int] -> Intcode -> Intcode
-setOutput o ic = Intcode{
-    input = input ic,
-    code = code ic,
-    ip = ip ic,
-    rb = rb ic,
-    output = o
-}
+setOutput = set output
 
 consOutput :: Int -> Intcode -> Intcode
-consOutput o ic = Intcode{
-    input = input ic,
-    code = code ic,
-    ip = ip ic,
-    rb = rb ic,
-    output = o:(output ic)
-}
+consOutput o = over output (\out -> o:out)
 
 scrubOutput :: Intcode -> Intcode
-scrubOutput ic = Intcode{
-    input = input ic,
-    code = code ic,
-    ip = ip ic,
-    rb = rb ic,
-    output = []
-}
+scrubOutput = set output []
 
 

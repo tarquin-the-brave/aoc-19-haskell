@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2f0c6db004d21ed5e52927636815098fc575079d150c9ca7680b50abb4895886
+-- hash: 235aa146eef49b5684af975202a3c62b0ae76feec86cb366ff5d9382caf2aa5e
 
 name:           intcode-monadfail
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
   build-depends:
       base >=4.7 && <5
     , listsafe
+    , microlens-platform
     , mtl
   default-language: Haskell2010
 
@@ -54,6 +55,7 @@ test-suite intcode-monadfail-test
       base >=4.7 && <5
     , intcode-monadfail
     , listsafe
+    , microlens-platform
     , mtl
     , split
     , tasty

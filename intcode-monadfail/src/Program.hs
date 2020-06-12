@@ -1,18 +1,13 @@
 --
 -- Prog Monad, for any program that might find itself in these states.
 --
+{-# LANGUAGE DeriveFunctor #-}
 module Program
   ( Prog (..)
   , crash
   ) where
 
-data Prog a = Running a | AwaitInput a | End a | Crashed String deriving(Show, Eq)
-
-instance Functor Prog where
-  fmap _ (Crashed e) = Crashed e
-  fmap f (End a) =  End (f a)
-  fmap f (Running a) = Running (f a)
-  fmap f (AwaitInput a) = AwaitInput (f a)
+data Prog a = Running a | AwaitInput a | End a | Crashed String deriving(Show, Eq, Functor)
 
 instance Applicative Prog where
   pure = Running
