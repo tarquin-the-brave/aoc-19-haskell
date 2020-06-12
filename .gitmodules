@@ -1,3 +1,0 @@
-[submodule "intcode-monadfail/tasty-laws"]
-	path = intcode-monadfail/tasty-laws
-	url = https://github.com/tarquin-the-brave/tasty-laws

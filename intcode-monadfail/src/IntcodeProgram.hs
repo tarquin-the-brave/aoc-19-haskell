@@ -2,7 +2,13 @@ module IntcodeProgram
   ( new
   , run
   , Prog (..)
-  , Intcode (..)
+  , Intcode
+  -- Intcode Lenses
+  , input
+  , code
+  , ip
+  , rb
+  , output
   ) where
 
 import Intcode

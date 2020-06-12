@@ -1,4 +1,5 @@
 import qualified IntcodeProgram as IC
+import Lens.Micro.Platform (view)
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -19,7 +20,7 @@ functionalTests :: [Int] -> TestTree
 functionalTests ic = testGroup "Tests of intcode computer function"
   [
     testCase "Intcode from day 9 tests all operations work correctly" $
-    (fmap IC.output . IC.run $ IC.new ic [1]) @?= IC.End [2171728567]
+    (fmap (view IC.output) . IC.run $ IC.new ic [1]) @?= IC.End [2171728567]
   ]
 
 testLaws :: TestTree

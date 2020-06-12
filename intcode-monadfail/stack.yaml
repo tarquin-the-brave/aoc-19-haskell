@@ -1,8 +1,11 @@
 resolver: lts-15.8
 packages:
 - .
-- tasty-laws
 extra-deps:
-  - tasty-laws/laws
-  - tasty-laws/tasty-dumbcheck
+  - github: tarquin-the-brave/tasty-laws
+    commit: 9a9dc5ef7967b60ac18dcbd9714b9a45c81904c2
+  - github: tarquin-the-brave/laws
+    commit: d4c3e6156e237b38ee2f45979daabbcb8589f1a4
+  - github: tarquin-the-brave/tasty-dumbcheck
+    commit: 685832220cbef8a0bb3a740234087827c73a701e
 
