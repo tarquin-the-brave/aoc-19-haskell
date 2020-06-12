@@ -11,7 +11,7 @@ module Intcode.Data
     , newIC
     ) where
 
-import Lens.Micro.Platform (makeLenses, over, set)
+import Lens.Micro.Platform (makeLenses)
 import qualified Data.Sequence as S
 
 --
