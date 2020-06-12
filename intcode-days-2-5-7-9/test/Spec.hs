@@ -20,7 +20,7 @@ functionalTests :: [Int] -> TestTree
 functionalTests ic = testGroup "Tests of intcode computer function"
   [
     testCase "Intcode from day 9 tests all operations work correctly" $
-    (fmap (view IC.output) . IC.run $ IC.new ic [1]) @?= IC.End [2171728567]
+    (fmap IC.out . IC.run $ IC.new ic [1]) @?= IC.End [2171728567]
   ]
 
 testLaws :: TestTree

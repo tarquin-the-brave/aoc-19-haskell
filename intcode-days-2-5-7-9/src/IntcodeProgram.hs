@@ -4,7 +4,12 @@ module IntcodeProgram
   , Prog (..)
   , Intcode
   -- Intcode Lenses
+  , input
   , output
+  -- Funtions for those not wanting to use lenses
+  , out
+  , clearOut
+  , setInput
   ) where
 
 import Intcode
@@ -14,6 +19,15 @@ import qualified Data.Sequence as S
 
 new :: [Int] -> [Int] -> Prog Intcode
 new ic = return . newIC (S.fromList ic)
+
+out :: Intcode -> [Int]
+out = view output
+
+clearOut :: Prog Intcode -> Prog Intcode
+clearOut = fmap $ set output []
+
+setInput :: [Int] -> Prog Intcode -> Prog Intcode
+setInput i = fmap $ set input i
 
 run :: Prog Intcode -> Prog Intcode
 run (Running ic) = run . runInstruction $ (ic)
