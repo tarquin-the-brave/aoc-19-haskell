@@ -1,8 +1,0 @@
-resolver: lts-15.8
-packages:
-- .
-- tasty-laws
-extra-deps:
-  - tasty-laws/laws
-  - tasty-laws/tasty-dumbcheck
-
