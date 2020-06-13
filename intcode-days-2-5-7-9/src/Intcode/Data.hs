@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module Intcode.Data
     ( Intcode
     -- Intcode Lenses
@@ -11,8 +12,10 @@ module Intcode.Data
     , newIC
     ) where
 
-import Lens.Micro.Platform (makeLenses)
+import Lens.Micro.Platform (makeLenses, set)
 import qualified Data.Sequence as S
+import GHC.Generics (Generic)
+import Data.Default (Default, def)
 
 --
 -- Intcode data
@@ -25,15 +28,10 @@ data Intcode = Intcode
   -- rb: Relative Base
   , _rb::Int
   , _output::[Int]
-  } deriving(Show, Eq)
+  }
+  deriving(Generic, Default, Show, Eq)
 
 makeLenses ''Intcode
 
 newIC :: S.Seq Int -> [Int] -> Intcode
-newIC newCode newInput = Intcode{
-  _input = newInput,
-  _code = newCode,
-  _ip = 0,
-  _rb = 0,
-  _output = []
-}
+newIC c i = set code c . set input i $ def

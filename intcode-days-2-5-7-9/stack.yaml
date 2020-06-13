@@ -2,6 +2,7 @@ resolver: lts-15.8
 packages:
 - .
 extra-deps:
+  # - data-default-extra-0.1.0@sha256:93923f4b1678ee70888eae2ba5fc89cfd9748a2a9d64923cc1f827415543435a,5395
   - github: tarquin-the-brave/tasty-laws
     commit: 9a9dc5ef7967b60ac18dcbd9714b9a45c81904c2
   - github: tarquin-the-brave/laws

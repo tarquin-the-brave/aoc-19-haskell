@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 01f1fb18dd5ea15ff41f68dfb79957ae41234673c55d2b9d772be007327ed3b8
+-- hash: 02c688e5c124fee889a69411c40932f1813a289ef9e81c2a355688282277abc9
 
 name:           intcode
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , data-default
     , listsafe
     , microlens-platform
     , mtl
@@ -55,6 +56,7 @@ test-suite intcode-test
   build-depends:
       base >=4.7 && <5
     , containers
+    , data-default
     , intcode
     , listsafe
     , microlens-platform

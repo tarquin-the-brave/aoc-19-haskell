@@ -25,6 +25,9 @@ dependencies:
 - listsafe
 - microlens-platform
 - containers
+# - generic-deriving
+# - data-default-extra
+- data-default
 
 library:
   source-dirs: src
